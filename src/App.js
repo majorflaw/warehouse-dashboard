@@ -22,7 +22,7 @@ ChartJS.register(
   Filler
 );
 
-const ChartComponent = ({ data, label, title, color }) => {
+const ChartComponent = ({ data, label, title, color, target }) => {
   const chartData = {
     labels: data.map(d => d.Hour),
     datasets: [
@@ -32,11 +32,20 @@ const ChartComponent = ({ data, label, title, color }) => {
         borderColor: color,
         backgroundColor: `${color}33`, // 33 is 20% opacity in hex
         fill: true,
-        tension: 0.3,
-        borderWidth: 0.9,
-        pointRadius: 5,
-        pointHoverRadius: 1,
+        tension: 0.1,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 0,
       },
+      {
+        label: 'Target',
+        data: Array(data.length).fill(target),
+        borderColor: 'red',
+        borderWidth: 2,
+        borderDash: [5, 5],
+        fill: false,
+        pointRadius: 0,
+      }
     ],
   };
 
@@ -52,14 +61,14 @@ const ChartComponent = ({ data, label, title, color }) => {
         text: title,
         color: 'white',
         font: {
-          size: 12, // Even smaller font size
-          weight: '400', // Less bold (normal weight)
+          size: 12,
+          weight: '400',
         },
         padding: {
           top: 10,
-          bottom: 20
+          bottom: 10
         },
-        align: 'start', // Align to the left
+        align: 'start',
       },
     },
     scales: {
@@ -110,12 +119,14 @@ const Dashboard = () => {
           label="Lines" 
           title="Lines Picked per Hour" 
           color="#119b9d"
+          target={20}
         />
         <ChartComponent 
           data={data} 
           label="Quantity" 
           title="Quantity Picked per Hour" 
           color="#e74475"
+          target={1000}
         />
       </div>
     </div>
