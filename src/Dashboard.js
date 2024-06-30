@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Line, Doughnut } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Filler,
@@ -19,6 +20,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Filler,
@@ -143,21 +145,115 @@ const DonutChartComponent = ({ data, title }) => {
   );
 };
 
+const BarChartComponent = ({ data, title }) => {
+  const chartData = {
+    labels: data.map(d => d.Operator),
+    datasets: [
+      {
+        label: 'Lines Picked',
+        data: data.map(d => d.Picked),
+        backgroundColor: '#0F084B',
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: title,
+        color: 'white',
+        font: {
+          size: 10,
+          weight: '400',
+        },
+        padding: {
+          top: 10,
+          bottom: 30
+        },
+        align: 'start',
+      },
+    },
+    scales: {
+      x: {
+        ticks: { color: 'white' },
+        grid: { color: '#2c3e50' },
+      },
+      y: {
+        ticks: { color: 'white' },
+        grid: { color: '#2c3e50' },
+      },
+    },
+  };
+
+  return (
+    <div className="h-[400px] w-full">
+      <Bar data={chartData} options={options} />
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [totalLinesPGI, setTotalLinesPGI] = useState(0);
-  const [totalHours, setTotalHours] = useState(0);
+  const [totalHours, setTotalHours] = useState(() => {
+    const storedHours = localStorage.getItem('totalWorkingHours');
+    return storedHours ? parseInt(storedHours) : 0;
+  });
   const [target, setTarget] = useState(0);
   const [pickingAreaData, setPickingAreaData] = useState({});
   const [openLinesPickToday, setOpenLinesPickToday] = useState(0);
-  const [openLinesPickFuture, setOpenLinesPickFuture] = useState(0);
+  const [openLinesPickTomorrow, setOpenLinesPickTomorrow] = useState(0);
   const [openLinesPGIToday, setOpenLinesPGIToday] = useState(0);
-  const [openLinesPGIFuture, setOpenLinesPGIFuture] = useState(0);
+  const [openLinesPGITomorrow, setOpenLinesPGITomorrow] = useState(0);
   const [openQuantityPickToday, setOpenQuantityPickToday] = useState(0);
-  const [openQuantityPickFuture, setOpenQuantityPickFuture] = useState(0);
+  const [openQuantityPickTomorrow, setOpenQuantityPickTomorrow] = useState(0);
+  const [operatorPickingData, setOperatorPickingData] = useState([]);
+
+  const fetchTotalHours = () => {
+    fetch('/hour_schedule.csv', { method: 'HEAD' })
+      .then(response => {
+        const lastModified = response.headers.get('Last-Modified');
+        if (lastModified !== localStorage.getItem('lastModified')) {
+          localStorage.setItem('lastModified', lastModified);
+          return fetch('/hour_schedule.csv');
+        }
+        return null;
+      })
+      .then(response => {
+        if (response) {
+          return response.text();
+        }
+        return null;
+      })
+      .then(csvData => {
+        if (csvData) {
+          const results = Papa.parse(csvData, { header: true });
+          const totalHours = results.data.reduce((total, row) => {
+            return total + Object.values(row).filter(value => value && value !== 'Out of Work').length - 1; // -1 to exclude the 'Operator' column
+          }, 0);
+          setTotalHours(totalHours);
+          localStorage.setItem('totalWorkingHours', totalHours.toString());
+        }
+      })
+      .catch(error => console.error('Error fetching hour_schedule.csv:', error));
+  };
 
   useEffect(() => {
+    fetchTotalHours();
+    const interval = setInterval(fetchTotalHours, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Fetch warehouse_data.csv
     Papa.parse('/warehouse_data.csv', {
       download: true,
       header: true,
@@ -173,7 +269,6 @@ const Dashboard = () => {
         if (results.data.length > 0) {
           const firstRow = results.data[0];
           setTotalLinesPGI(parseInt(firstRow['Total Lines PGI']) || 0);
-          setTotalHours(Math.round(parseFloat(firstRow['Total Hours']) || 0));
           setTarget(parseFloat(firstRow['Target']) || 0);
           
           setPickingAreaData({
@@ -185,12 +280,28 @@ const Dashboard = () => {
           });
 
           setOpenLinesPickToday(parseInt(firstRow['Open Lines Pick Today']) || 0);
-          setOpenLinesPickFuture(parseInt(firstRow['Open Lines Pick Future']) || 0);
+          setOpenLinesPickTomorrow(parseInt(firstRow['Open Lines Pick Future']) || 0);
           setOpenLinesPGIToday(parseInt(firstRow['Open Lines PGI Today']) || 0);
-          setOpenLinesPGIFuture(parseInt(firstRow['Open Lines PGI Future']) || 0);
+          setOpenLinesPGITomorrow(parseInt(firstRow['Open Lines PGI Future']) || 0);
           setOpenQuantityPickToday(parseInt(firstRow['Open Quantity Pick Today']) || 0);
-          setOpenQuantityPickFuture(parseInt(firstRow['Open Quantity Pick Future']) || 0);
+          setOpenQuantityPickTomorrow(parseInt(firstRow['Open Quantity Pick Future']) || 0);
         }
+      }
+    });
+
+    // Fetch operator_picking.csv
+    Papa.parse('/operator_picking.csv', {
+      download: true,
+      header: true,
+      complete: (results) => {
+        const parsedData = results.data
+          .map(row => ({
+            Operator: row.Operator,
+            Picked: parseInt(row.Picked) || 0
+          }))
+          .filter(row => row.Picked > 0) // Filter out operators with 0 lines picked
+          .sort((a, b) => b.Picked - a.Picked); // Sort in descending order
+        setOperatorPickingData(parsedData);
       }
     });
   }, []);
@@ -227,13 +338,13 @@ const Dashboard = () => {
       <div className="flex flex-wrap justify-between items-stretch mb-8 -mx-2">
         <TotalMetric label="Total Lines Picked" value={totalLines.toLocaleString()} color="#37D2BB" subtext={lineSubtext} />
         <TotalMetric label="Open Lines Pick Today" value={openLinesPickToday.toLocaleString()} color="#37D2BB" />
-        <TotalMetric label="Open Lines Pick Future" value={openLinesPickFuture.toLocaleString()} color="#37D2BB" />
+        <TotalMetric label="Open Lines Pick Tomorrow" value={openLinesPickTomorrow.toLocaleString()} color="#37D2BB" />
         <TotalMetric label="Total Quantity Picked" value={totalQuantity.toLocaleString()} color="#F57200" />
         <TotalMetric label="Open Quantity Pick Today" value={openQuantityPickToday.toLocaleString()} color="#F57200" />
-        <TotalMetric label="Open Quantity Pick Future" value={openQuantityPickFuture.toLocaleString()} color="#F57200" />
+        <TotalMetric label="Open Quantity Pick Tomorrow" value={openQuantityPickTomorrow.toLocaleString()} color="#F57200" />
         <TotalMetric label="Total Lines PGI" value={totalLinesPGI.toLocaleString()} color="#5E239D" />
         <TotalMetric label="Open Lines PGI Today" value={openLinesPGIToday.toLocaleString()} color="#5E239D" />
-        <TotalMetric label="Open Lines PGI Future" value={openLinesPGIFuture.toLocaleString()} color="#5E239D" />
+        <TotalMetric label="Open Lines PGI Tomorrow" value={openLinesPGITomorrow.toLocaleString()} color="#5E239D" />
         <TotalMetric label="Total Hours" value={totalHours} color="#030311" onClick={handleTotalHoursClick} />
         <TotalMetric label="Overall Productivity" value={overallProductivity} color={productivityColor} />
       </div>
@@ -262,6 +373,12 @@ const Dashboard = () => {
             />
           </div>
         </div>
+      </div>
+      <div className="mb-8">
+        <BarChartComponent 
+          data={operatorPickingData}
+          title="Picked per User"
+        />
       </div>
     </div>
   );
