@@ -13,78 +13,99 @@ const useWebSocket = () => {
   const reconnectAttempts = useRef(0);
   const maxReconnectDelay = 30000;
 
+  const getWebSocketURL = () => {
+    // Check if we're in development mode
+    if (window.location.hostname === 'localhost') {
+      // Try production URL if local fails
+      return ['ws://localhost:8000/ws', 'wss://warehouse-dashboard-api.onrender.com/ws'];
+    }
+    // Production URL only
+    return ['wss://warehouse-dashboard-api.onrender.com/ws'];
+  };
+
   const connect = useCallback(() => {
     try {
-      const ws = new WebSocket('ws://localhost:8000/ws');
+      const urls = getWebSocketURL();
+      let currentUrlIndex = 0;
 
-      ws.onopen = () => {
-        console.log('Connected to webSocket');
-        setStatus('connected');
-        reconnectAttempts.current = 0;
-
-        const heartbeat = setInterval(() => {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send('ping');
-          }
-        }, 30000);
-        
-        wsRef.current = { socket: ws, heartbeat };
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          if (event.data === 'pong') {
-            console.debug('Received pong');
-            return;
-          }
-
-          const message = JSON.parse(event.data);
-          console.debug('Received WebSocket message:', message.type);
-
-          switch (message.type) {
-            case 'initial_data':
-              setData(message.data);
-              toast.success('Connected to server');
-              break;
-
-            case 'data_update':
-              setData(prevData => {
-                const isEqual = JSON.stringify(prevData) === JSON.stringify(message.data);
-                if (!isEqual) {
-                  toast.success('Data updated');
-                  return message.data;
-                }
-                return prevData;
-              });
-              break;
-
-            default:
-              console.log('Unknown message type:', message.type);
-          }
-        } catch (error) {
-          console.error('Error processing WebSocket message:', error, event.data);
-        }
-      };
-
-      ws.onclose = () => {
-        setStatus('disconnected');
-        console.log('WebSocket disconnected');
-
-        if (wsRef.current?.heartbeat) {
-          clearInterval(wsRef.current.heartbeat);
+      const tryConnect = () => {
+        if (currentUrlIndex >= urls.length) {
+          console.error('Failed to connect to all WebSocket URLs');
+          setStatus('error');
+          return;
         }
 
-        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), maxReconnectDelay);
-        reconnectAttempts.current++;
+        const ws = new WebSocket(urls[currentUrlIndex]);
 
-        console.log(`Reconnecting in ${delay}ms...`);
-        setTimeout(connect, delay);
+        ws.onopen = () => {
+          console.log('Connected to WebSocket:', urls[currentUrlIndex]);
+          setStatus('connected');
+          reconnectAttempts.current = 0;
+
+          const heartbeat = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send('ping');
+            }
+          }, 30000);
+          
+          wsRef.current = { socket: ws, heartbeat };
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            if (event.data === 'pong') {
+              console.debug('Received pong');
+              return;
+            }
+
+            const message = JSON.parse(event.data);
+            console.debug('Received WebSocket message:', message.type);
+
+            switch (message.type) {
+              case 'initial_data':
+                setData(message.data);
+                toast.success('Connected to server');
+                break;
+
+              case 'data_update':
+                setData(prevData => {
+                  const isEqual = JSON.stringify(prevData) === JSON.stringify(message.data);
+                  if (!isEqual) {
+                    toast.success('Data updated');
+                    return message.data;
+                  }
+                  return prevData;
+                });
+                break;
+
+              default:
+                console.log('Unknown message type:', message.type);
+            }
+          } catch (error) {
+            console.error('Error processing WebSocket message:', error, event.data);
+          }
+        };
+
+        ws.onclose = () => {
+          setStatus('disconnected');
+          console.log('WebSocket disconnected');
+
+          if (wsRef.current?.heartbeat) {
+            clearInterval(wsRef.current.heartbeat);
+          }
+
+          // Try next URL if available
+          currentUrlIndex++;
+          setTimeout(tryConnect, 1000);
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          ws.close();
+        };
       };
 
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        setStatus('error');
-      };
+      tryConnect();
     } catch (error) {
       console.error('WebSocket connection error:', error);
       setStatus('error');
