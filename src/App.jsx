@@ -9,6 +9,7 @@ import { toast, Toaster } from 'react-hot-toast';
 const useWebSocket = () => {
   const [status, setStatus] = useState('connecting');
   const [data, setData] = useState([]);
+  const [statistics, setStatistics] = useState(null);
   const wsRef = useRef(null);
   const reconnectAttempts = useRef(0);
   const maxReconnectDelay = 30000;
@@ -47,7 +48,6 @@ const useWebSocket = () => {
               ws.send('ping');
             }
           }, 30000);
-          
           wsRef.current = { socket: ws, heartbeat };
         };
 
@@ -60,10 +60,15 @@ const useWebSocket = () => {
 
             const message = JSON.parse(event.data);
             console.debug('Received WebSocket message:', message.type);
+            console.debug('Message content:', message);
 
             switch (message.type) {
               case 'initial_data':
                 setData(message.data);
+                if (message.statistics) {
+                  console.debug('Setting initial statistics:', message.statistics);
+                  setStatistics(message.statistics);
+                }
                 toast.success('Connected to server');
                 break;
 
@@ -76,6 +81,10 @@ const useWebSocket = () => {
                   }
                   return prevData;
                 });
+                if (message.statistics) {
+                  console.debug('Updating statistics:', message.statistics);
+                  setStatistics(message.statistics);
+                }
                 break;
 
               default:
@@ -123,7 +132,7 @@ const useWebSocket = () => {
     };
   }, [connect]);
 
-  return { status, data };
+  return { status, data, statistics };
 };
 
 const getTransportIcon = (way) => {
@@ -300,9 +309,68 @@ function ConnectionStatus({ status }) {
   );
 }
 
+function StatsCard({ title, stats }) {
+  const formatNumber = (num) => {
+    return num?.toLocaleString() ?? '0';
+  };
+
+  return (
+    <Card className="bg-gray-800 border-gray-700">
+      <div className="p-4">
+        <h2 className="text-xl font-bold text-gray-200 mb-4">{title}</h2>
+        <div className="space-y-3">
+          {Object.entries(stats).map(([key, value]) => (
+            <div key={key} className="flex justify-between items-center">
+              <span className="text-gray-400">{key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+              <span className="text-gray-200 font-mono">{formatNumber(value)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function StatsPanels({ data }) {
+  console.debug('StatsPanels received data:', data);
+
+  const p2bStats = {
+    total_lines: data?.p2b?.total_p2b_lines || 0,
+    open_lines: data?.p2b?.total_open_lines || 0,
+    total_pallets: data?.p2b?.total_pallets || 0,
+    pallets_picked: data?.p2b?.total_pallets_picked || 0,
+    pallets_closed: data?.p2b?.total_pallets_closed || 0,
+    total_parcels: data?.p2b?.total_parcels || 0,
+    parcels_picked: data?.p2b?.total_parcels_picked || 0,
+    parcels_closed: data?.p2b?.total_parcels_closed || 0
+  };
+
+  const legacyStats = {
+    total_lines: data?.legacy?.total_legacy_lines || 0,
+    open_lines: data?.legacy?.total_open_lines || 0,
+    total_packed_lines: data?.legacy?.total_packed_lines || 0,
+    open_packed_lines: data?.legacy?.total_open_packed_lines || 0
+  };
+
+  const totalStats = {
+    total_lines: data?.total?.total_all_lines || 0,
+    total_p2b_lines: data?.total?.total_p2b_lines || 0,
+    total_legacy_lines: data?.total?.total_legacy_lines || 0,
+    total_open_picking: data?.total?.total_open_picking || 0,
+    total_picked_lines: data?.total?.total_picked_lines || 0
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <StatsCard title="P2B" stats={p2bStats} />
+      <StatsCard title="LEGACY" stats={legacyStats} />
+      <StatsCard title="TOTAL" stats={totalStats} />
+    </div>
+  );
+}
+
 function App() {
-  const { status, data: shipments } = useWebSocket();
-  //const [shipments, setShipments] = useState([]);
+  const { status, data: shipments, statistics } = useWebSocket();
   const [dateFilter, setDateFilter] = useState('allOpen');
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -340,23 +408,23 @@ function App() {
 
   const filteredShipments = useMemo(() => {
     if (!shipments || !shipments.length) return [];
-  
+
     const today = new Date(currentTime);
     today.setHours(0, 0, 0, 0);
-  
+
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-  
-    return shipments.filter(shipment => {
-      // Add null check for shipment and shipment_end_date
+
+    const filtered = shipments.filter(shipment => {
+      // Existing filter logic...
       if (!shipment || !shipment.shipment_end_date) {
         return false;
       }
-  
+
       try {
         const shipmentDate = new Date(shipment.shipment_end_date.split('.').reverse().join('-'));
         shipmentDate.setHours(0, 0, 0, 0);
-  
+
         switch (dateFilter) {
           case 'today':
             return shipmentDate.getTime() === today.getTime();
@@ -376,6 +444,13 @@ function App() {
         console.error('Error filtering shipment:', shipment, error);
         return false;
       }
+    });
+
+    // Sort by date (oldest to newest)
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.shipment_end_date.split('.').reverse().join('-'));
+      const dateB = new Date(b.shipment_end_date.split('.').reverse().join('-'));
+      return dateA - dateB;
     });
   }, [shipments, dateFilter, currentTime]);
 
@@ -446,13 +521,14 @@ function App() {
         <ConnectionStatus status={status} />
       </div>
       <div className="max-w-full mx-auto">
-        <Card className="bg-gray-800 border-gray-700">
-          {status === 'connecting' ? (
-            <div className="h-[600px] flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
-            </div>
-          ) : (
-            <>
+        {status === 'connecting' ? (
+          <div className="h-[600px] flex items-center justify-center">
+            <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+          </div>
+        ) : (
+          <>
+            <StatsPanels data={statistics} />
+            <Card className="bg-gray-800 border-gray-700">
               <DateFilter selectedFilter={dateFilter} onFilterChange={setDateFilter} />
               <div className="relative">
                 {/* Table wrapper with horizontal scroll */}
@@ -509,9 +585,9 @@ function App() {
               </div>
               <Legend />
               <Toaster position="top-right" />
-            </>
-          )}
-        </Card>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );
