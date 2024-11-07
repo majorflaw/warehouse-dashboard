@@ -335,29 +335,29 @@ function StatsPanels({ data }) {
   console.debug('StatsPanels received data:', data);
 
   const p2bStats = {
-    total_lines: data?.p2b?.total_p2b_lines || 0,
-    open_lines: data?.p2b?.total_open_lines || 0,
-    total_pallets: data?.p2b?.total_pallets || 0,
-    pallets_picked: data?.p2b?.total_pallets_picked || 0,
-    pallets_closed: data?.p2b?.total_pallets_closed || 0,
-    total_parcels: data?.p2b?.total_parcels || 0,
-    parcels_picked: data?.p2b?.total_parcels_picked || 0,
-    parcels_closed: data?.p2b?.total_parcels_closed || 0
+    total_lines: data?.p2b?.metadata?.total_p2b_lines || 0,
+    open_lines: data?.p2b?.metadata?.total_open_lines || 0,
+    total_pallets: data?.p2b?.metadata?.total_pallets || 0,
+    pallets_picked: data?.p2b?.metadata?.total_pallets_picked || 0,
+    pallets_closed: data?.p2b?.metadata?.total_pallets_closed || 0,
+    total_parcels: data?.p2b?.metadata?.total_parcels || 0,
+    parcels_picked: data?.p2b?.metadata?.total_parcels_picked || 0,
+    parcels_closed: data?.p2b?.metadata?.total_parcels_closed || 0
   };
 
   const legacyStats = {
-    total_lines: data?.legacy?.total_legacy_lines || 0,
-    open_lines: data?.legacy?.total_open_lines || 0,
-    total_packed_lines: data?.legacy?.total_packed_lines || 0,
-    open_packed_lines: data?.legacy?.total_open_packed_lines || 0
+    total_lines: data?.legacy?.metadata?.total_legacy_lines || 0,
+    open_lines: data?.legacy?.metadata?.total_open_lines || 0,
+    total_packed_lines: data?.legacy?.metadata?.total_packed_lines || 0,
+    open_packed_lines: data?.legacy?.metadata?.total_open_packed_lines || 0
   };
 
   const totalStats = {
-    total_lines: data?.total?.total_all_lines || 0,
-    total_p2b_lines: data?.total?.total_p2b_lines || 0,
-    total_legacy_lines: data?.total?.total_legacy_lines || 0,
-    total_open_picking: data?.total?.total_open_picking || 0,
-    total_picked_lines: data?.total?.total_picked_lines || 0
+    total_lines: (data?.p2b?.metadata?.total_p2b_lines || 0) + (data?.legacy?.metadata?.total_legacy_lines || 0),
+    total_p2b_lines: data?.p2b?.metadata?.total_p2b_lines || 0,
+    total_legacy_lines: data?.legacy?.metadata?.total_legacy_lines || 0,
+    total_open_picking: (data?.p2b?.metadata?.total_open_lines || 0) + (data?.legacy?.metadata?.total_open_lines || 0),
+    total_picked_lines: (data?.p2b?.metadata?.total_confirmed_lines || 0) + (data?.legacy?.metadata?.total_confirmed_lines || 0)
   };
 
   return (
