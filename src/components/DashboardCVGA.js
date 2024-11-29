@@ -60,7 +60,8 @@ const DashboardCVGA = () => {
             total_hu: item.total_hu?.toString() || '0',
             hu_nested: item.hu_nested?.toString() || '0',
             tos_packed: item.tos_packed?.toString() || '0',
-            total_lines: item.total_lines?.toString() || '0'
+            total_lines: item.total_lines?.toString() || '0',
+            picked_lines: item.picked_lines?.toString() || '0'
           }));
         
         setShipments(validData);
@@ -194,6 +195,9 @@ const DashboardCVGA = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     TO Packed
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Lines
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -208,7 +212,18 @@ const DashboardCVGA = () => {
                         : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {shipment.country}
+                      {shipment.country !== 'N/A' ? (
+                        <div className="flex items-center">
+                          <img
+                            src={`https://flagcdn.com/w20/${shipment.country.toLowerCase()}.png`}
+                            alt={shipment.country}
+                            className="w-4 h-4 rounded-full mr-2"
+                          />
+                          {shipment.country}
+                        </div>
+                      ) : (
+                        'N/A'
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {shipment.process}
@@ -227,6 +242,9 @@ const DashboardCVGA = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {`${shipment.tos_packed}/${shipment.total_lines}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {`${shipment.picked_lines}/${shipment.total_lines}`}
                     </td>
                   </tr>
                 ))}

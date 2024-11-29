@@ -37,3 +37,8 @@
     * HU -> We should have here Z/X, where Z is the value from total_hu_closed column and X is the value from total_hu column.
     * HU NESTED -> We should have here Z/X, where Z is the value from hu_nested column and X is the value from total_hu column.
     * TO PACKED -> We should have here Z/X, where Z is the value from tos_packed column and X is the value from total_lines column.
+
+# 5. A Flow Pages (5)
+* Add new columns:
+    * LINES -> We should have here Z/X, where Z is the value from picked_lines column and X is the value from total_lines column.
+    * We need to add to the COUNTRY column, also the flag of that country code, in the left of the country code. Make the flag be a circle, smaller than the text so it will not take too much space, but enough to be visible.
