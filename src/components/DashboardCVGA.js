@@ -177,7 +177,7 @@ const DashboardCVGA = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-900">
+    <div className="p-6 bg-gray-900 min-h-screen">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center">
@@ -264,6 +264,15 @@ const DashboardCVGA = () => {
                 ...base,
                 backgroundColor: '#1f2937',
                 borderColor: '#374151',
+                minHeight: '38px',
+                height: '38px',
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                height: '38px',
+                padding: '0 6px',
+                maxHeight: '38px',
+                overflowY: 'auto',
               }),
               menu: (base) => ({
                 ...base,
@@ -289,6 +298,10 @@ const DashboardCVGA = () => {
                   backgroundColor: '#4b5563',
                   color: '#fff',
                 },
+              }),
+              input: (base) => ({
+                ...base,
+                color: '#d1d5db',
               }),
             }}
           />
@@ -307,6 +320,15 @@ const DashboardCVGA = () => {
                 ...base,
                 backgroundColor: '#1f2937',
                 borderColor: '#374151',
+                minHeight: '38px',
+                height: '38px',
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                height: '38px',
+                padding: '0 6px',
+                maxHeight: '38px',
+                overflowY: 'auto',
               }),
               menu: (base) => ({
                 ...base,
@@ -332,6 +354,10 @@ const DashboardCVGA = () => {
                   backgroundColor: '#4b5563',
                   color: '#fff',
                 },
+              }),
+              input: (base) => ({
+                ...base,
+                color: '#d1d5db',
               }),
             }}
           />
@@ -350,6 +376,15 @@ const DashboardCVGA = () => {
                 ...base,
                 backgroundColor: '#1f2937',
                 borderColor: '#374151',
+                minHeight: '38px',
+                height: '38px',
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                height: '38px',
+                padding: '0 6px',
+                maxHeight: '38px',
+                overflowY: 'auto',
               }),
               menu: (base) => ({
                 ...base,
@@ -375,6 +410,10 @@ const DashboardCVGA = () => {
                   backgroundColor: '#4b5563',
                   color: '#fff',
                 },
+              }),
+              input: (base) => ({
+                ...base,
+                color: '#d1d5db',
               }),
             }}
           />
@@ -393,6 +432,15 @@ const DashboardCVGA = () => {
                 ...base,
                 backgroundColor: '#1f2937',
                 borderColor: '#374151',
+                minHeight: '38px',
+                height: '38px',
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                height: '38px',
+                padding: '0 6px',
+                maxHeight: '38px',
+                overflowY: 'auto',
               }),
               menu: (base) => ({
                 ...base,
@@ -418,6 +466,10 @@ const DashboardCVGA = () => {
                   backgroundColor: '#4b5563',
                   color: '#fff',
                 },
+              }),
+              input: (base) => ({
+                ...base,
+                color: '#d1d5db',
               }),
             }}
           />
@@ -436,6 +488,15 @@ const DashboardCVGA = () => {
                 ...base,
                 backgroundColor: '#1f2937',
                 borderColor: '#374151',
+                minHeight: '38px',
+                height: '38px',
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                height: '38px',
+                padding: '0 6px',
+                maxHeight: '38px',
+                overflowY: 'auto',
               }),
               menu: (base) => ({
                 ...base,
@@ -461,6 +522,10 @@ const DashboardCVGA = () => {
                   backgroundColor: '#4b5563',
                   color: '#fff',
                 },
+              }),
+              input: (base) => ({
+                ...base,
+                color: '#d1d5db',
               }),
             }}
           />
