@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTimes, faExclamationTriangle, faPlane, faTruck, faShip, faClipboardCheck, faTools, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes, faExclamationTriangle, faPlane, faTruck, faShip, faMagnifyingGlass, faBoxOpen, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 const DashboardCVGA = () => {
   const [shipments, setShipments] = useState([]);
@@ -284,20 +284,20 @@ const DashboardCVGA = () => {
                           <FontAwesomeIcon icon={faPlane} className="text-blue-500" />
                         )}
                         {shipment.transport_way === 'ROAD' && (
-                          <FontAwesomeIcon icon={faTruck} className="text-gray-500" />
+                          <FontAwesomeIcon icon={faTruck} className="text-blue-500" />
                         )}
                         {shipment.transport_way === 'OCEAN' && (
-                          <FontAwesomeIcon icon={faShip} className="text-blue-700" />
+                          <FontAwesomeIcon icon={faShip} className="text-blue-500" />
                         )}
                         
                         {/* Check Status */}
                         {shipment.is_check && (
-                          <FontAwesomeIcon icon={faClipboardCheck} className="text-purple-500" />
+                          <FontAwesomeIcon icon={faMagnifyingGlass} className="text-purple-500" />
                         )}
                         
                         {/* VAS Status */}
                         {shipment.is_vas && (
-                          <FontAwesomeIcon icon={faTools} className="text-indigo-500" />
+                          <FontAwesomeIcon icon={faBoxOpen} className="text-indigo-500" />
                         )}
                         
                         {/* DG Status */}
