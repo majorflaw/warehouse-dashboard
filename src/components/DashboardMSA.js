@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTimes, faExclamationTriangle, faPlane, faTruck, faShip, faClipboardCheck, faTools, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 const DashboardMSA = () => {
   const [shipments, setShipments] = useState([]);
@@ -61,7 +63,14 @@ const DashboardMSA = () => {
             hu_nested: item.hu_nested?.toString() || '0',
             tos_packed: item.tos_packed?.toString() || '0',
             total_lines: item.total_lines?.toString() || '0',
-            picked_lines: item.picked_lines?.toString() || '0'
+            picked_lines: item.picked_lines?.toString() || '0',
+            is_created: item.is_created || false,
+            is_issue: item.is_issue || false,
+            issue_count: item.issue_count || 0,
+            transport_way: item.transport_way || 'N/A',
+            is_check: item.is_check || false,
+            is_vas: item.is_vas || false,
+            is_dg: item.is_dg || false
           }));
         
         setShipments(validData);
@@ -198,6 +207,9 @@ const DashboardMSA = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Lines
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -245,6 +257,54 @@ const DashboardMSA = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {`${shipment.picked_lines}/${shipment.total_lines}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="flex items-center space-x-2">
+                        {/* Created Status */}
+                        <FontAwesomeIcon 
+                          icon={shipment.is_created ? faCheck : faTimes}
+                          className={shipment.is_created ? 'text-green-500' : 'text-red-500'}
+                        />
+                        
+                        {/* Issue Status */}
+                        {shipment.is_issue && (
+                          <div className="relative">
+                            <FontAwesomeIcon 
+                              icon={faExclamationTriangle} 
+                              className="text-yellow-500"
+                            />
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                              {shipment.issue_count}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {/* Transport Way */}
+                        {shipment.transport_way === 'AIR' && (
+                          <FontAwesomeIcon icon={faPlane} className="text-blue-500" />
+                        )}
+                        {shipment.transport_way === 'ROAD' && (
+                          <FontAwesomeIcon icon={faTruck} className="text-gray-500" />
+                        )}
+                        {shipment.transport_way === 'OCEAN' && (
+                          <FontAwesomeIcon icon={faShip} className="text-blue-700" />
+                        )}
+                        
+                        {/* Check Status */}
+                        {shipment.is_check && (
+                          <FontAwesomeIcon icon={faClipboardCheck} className="text-purple-500" />
+                        )}
+                        
+                        {/* VAS Status */}
+                        {shipment.is_vas && (
+                          <FontAwesomeIcon icon={faTools} className="text-indigo-500" />
+                        )}
+                        
+                        {/* DG Status */}
+                        {shipment.is_dg && (
+                          <FontAwesomeIcon icon={faExclamationCircle} className="text-orange-500" />
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -42,3 +42,13 @@
 * Add new columns:
     * LINES -> We should have here Z/X, where Z is the value from picked_lines column and X is the value from total_lines column.
     * We need to add to the COUNTRY column, also the flag of that country code, in the left of the country code. Make the flag be a circle, smaller than the text so it will not take too much space, but enough to be visible.
+
+# 6. A Flow Pages (6)
+* Add new column:
+    * STATUS -> Here we will add only icons, and we will add icons for the following statuses:
+        * is_created -> if the column has value true, let's make a check icon with green color, if false, a red icon with an X.
+        * is_issue -> if the column has value true, let's make an icon that shows that shipment has issue, and also to add a bubble with the number of issues that can be taken from the issue_count column.
+        * transport_way -> here we need 3 icons, one for "AIR", one for "ROAD", one for "OCEAN".
+        * is_check -> here we need an icon to show if the value is true, that represents 100% check needed.
+        * is_vas -> an icon that shows if the value is true, that can represent Value Added Service.
+        * is_dg -> an icon that shows if the value is true, that the shipment contains Dangerous Goods.
