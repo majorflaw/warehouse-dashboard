@@ -12,3 +12,22 @@
     * "B FLOW"
 * When user press on either of those buttons, it should go to another page, for now those new pages should be empty, we will work on them in the next steps.
 * Create also a button for the second page, to go back to the main page.
+
+# 2. A Flow Pages (2)
+* Let's work now on the MS A Flow Page, so if the user presses on MS and then on A FLOW, it should get our Dashboard Page. Rename also the file something like "DashboardMSA.js" or something like that.
+* Create also the same page for CVG A Flow Page, so if the user presses on CVG and then on A FLOW.
+* For CVG A Flow Page instead of fetching from https://warehouse-data-server.onrender.com/api/testing/a_flow_shipment_data.json it should fetch from https://warehouse-data-server.onrender.com/api/testing_cvg/a_flow_shipment_data.json
+* For now do not change anything in the Dashboard page, we will work on it in the next step.
+
+# 3. A Flow Pages (3)
+* From the dashboard page, remove the text that says "MS A Flow Dashboard" & "CVG A Flow Dashboard" and also the amount of shipments found.
+* I want different columns in the table:
+    * SHIPMENT NUMBER (which is already there, so that's good)
+    * Remove Transport Way (we will work on it later)
+    * Remove Priority (we will work on it later)
+    * Remove Progress (we will work on it later)
+    * Remove Status (we will work on it later)
+    * END DATE -> which can be taken from shipment_end_date column. The value now is in DDMMYYYY format, you should convert it to DD.MM.YYYY format.
+    * PROCESS -> which can be taken from process column.
+    * QUANTITY -> which can be taken from total_quantity column.
+    * FLOW -> which can be taken from flow column.

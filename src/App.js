@@ -1,23 +1,30 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
+import DashboardCVGA from './components/DashboardCVGA';
+import DashboardMSA from './components/DashboardMSA';
 
 // Main Welcome Page
 const WelcomePage = () => {
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
-      <h1 className="text-white text-3xl font-bold mb-8">
-        Welcome, please choose your department...
-      </h1>
-      <div className="space-x-4">
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+      <div className="flex flex-col items-start mb-12">
+        <h1 className="text-white text-7xl font-[900] mb-2 font-montserrat">
+          Welcome,
+        </h1>
+        <h2 className="text-white text-3xl font-[700] font-montserrat">
+          please choose your department...
+        </h2>
+      </div>
+      <div className="space-x-8">
         <Link
           to="/department/ms"
-          className="px-6 py-3 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-700 transition-colors"
+          className="px-12 py-3 bg-gray-900 text-white text-xl font-montserrat font-bold rounded-md hover:bg-gray-800 transition-colors border border-gray-800"
         >
           MS
         </Link>
         <Link
           to="/department/cvg"
-          className="px-6 py-3 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-700 transition-colors"
+          className="px-12 py-3 bg-gray-900 text-white text-xl font-montserrat font-bold rounded-md hover:bg-gray-800 transition-colors border border-gray-800"
         >
           CVG
         </Link>
@@ -29,29 +36,38 @@ const WelcomePage = () => {
 // Flow Selection Page
 const FlowSelectionPage = () => {
   const navigate = useNavigate();
-  
+  const { id } = useParams();
+
+  const handleFlowSelection = (flow) => {
+    if (id === 'ms' && flow === 'a') {
+      navigate('/flow/ms-a');
+    } else if (id === 'cvg' && flow === 'a') {
+      navigate('/flow/cvg-a');
+    } else {
+      navigate(`/flow/${flow}`);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
-      <h1 className="text-white text-3xl font-bold mb-8">
-        Please choose the flow...
-      </h1>
-      <div className="space-x-4 mb-8">
-        <Link
-          to="/flow/a"
-          className="px-6 py-3 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-700 transition-colors"
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold text-white mb-8 font-montserrat">Select Flow</h1>
+      <div className="space-y-8">
+        <button
+          onClick={() => handleFlowSelection('a')}
+          className="px-12 py-3 bg-gray-900 text-white text-xl font-montserrat font-bold rounded-md hover:bg-gray-800 transition-colors border border-gray-800"
         >
           A FLOW
-        </Link>
-        <Link
-          to="/flow/b"
-          className="px-6 py-3 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-700 transition-colors"
+        </button>
+        <button
+          onClick={() => handleFlowSelection('b')}
+          className="px-12 py-3 bg-gray-900 text-white text-xl font-montserrat font-bold rounded-md hover:bg-gray-800 transition-colors border border-gray-800"
         >
           B FLOW
-        </Link>
+        </button>
       </div>
       <button
         onClick={() => navigate('/')}
-        className="px-6 py-3 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-700 transition-colors"
+        className="mt-8 text-gray-400 hover:text-white font-montserrat"
       >
         Back to Main Page
       </button>
@@ -64,13 +80,18 @@ const FlowPage = () => {
   const navigate = useNavigate();
   
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
-      <div className="text-white text-xl">
-        Flow Page (Under Construction)
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+      <div className="flex flex-col items-start mb-12">
+        <h1 className="text-white text-7xl font-[900] mb-2 font-montserrat">
+          Flow Page,
+        </h1>
+        <h2 className="text-white text-3xl font-[700] font-montserrat">
+          under construction...
+        </h2>
       </div>
       <button
         onClick={() => navigate('/')}
-        className="mt-8 px-6 py-3 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-700 transition-colors"
+        className="px-12 py-3 bg-gray-900 text-white text-xl font-montserrat font-bold rounded-md hover:bg-gray-800 transition-colors border border-gray-800"
       >
         Back to Main Page
       </button>
@@ -85,6 +106,8 @@ function App() {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/department/:id" element={<FlowSelectionPage />} />
         <Route path="/flow/:id" element={<FlowPage />} />
+        <Route path="/flow/ms-a" element={<DashboardMSA />} />
+        <Route path="/flow/cvg-a" element={<DashboardCVGA />} />
       </Routes>
     </Router>
   );
