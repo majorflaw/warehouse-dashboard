@@ -31,3 +31,9 @@
     * PROCESS -> which can be taken from process column.
     * QUANTITY -> which can be taken from total_quantity column.
     * FLOW -> which can be taken from flow column.
+
+# 4. A Flow Pages (4)
+* Add new columns:
+    * HU -> We should have here Z/X, where Z is the value from total_hu_closed column and X is the value from total_hu column.
+    * HU NESTED -> We should have here Z/X, where Z is the value from hu_nested column and X is the value from total_hu column.
+    * TO PACKED -> We should have here Z/X, where Z is the value from tos_packed column and X is the value from total_lines column.

@@ -52,9 +52,15 @@ const DashboardMSA = () => {
           .map(item => ({
             shipment: item.shipment?.toString() || 'N/A',
             shipment_end_date: item.shipment_end_date || 'N/A',
+            country: item.country || 'N/A',
             process: item.process || 'N/A',
             total_quantity: item.total_quantity?.toString() || 'N/A',
-            flow: item.flow || 'N/A'
+            flow: item.flow || 'N/A',
+            total_hu_closed: item.total_hu_closed?.toString() || '0',
+            total_hu: item.total_hu?.toString() || '0',
+            hu_nested: item.hu_nested?.toString() || '0',
+            tos_packed: item.tos_packed?.toString() || '0',
+            total_lines: item.total_lines?.toString() || '0'
           }));
         
         setShipments(validData);
@@ -168,6 +174,9 @@ const DashboardMSA = () => {
                     End Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Country
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Process
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -175,6 +184,15 @@ const DashboardMSA = () => {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Flow
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    HU
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    HU Nested
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    TO Packed
                   </th>
                 </tr>
               </thead>
@@ -190,6 +208,9 @@ const DashboardMSA = () => {
                         : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {shipment.country}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {shipment.process}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -197,6 +218,15 @@ const DashboardMSA = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {shipment.flow}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {`${shipment.total_hu_closed}/${shipment.total_hu}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {`${shipment.hu_nested}/${shipment.total_hu}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {`${shipment.tos_packed}/${shipment.total_lines}`}
                     </td>
                   </tr>
                 ))}
