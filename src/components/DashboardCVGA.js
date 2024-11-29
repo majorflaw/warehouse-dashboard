@@ -1,11 +1,99 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes, faExclamationTriangle, faPlane, faTruck, faShip, faMagnifyingGlass, faBoxOpen, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import Select from 'react-select';
 
 const DashboardCVGA = () => {
   const [shipments, setShipments] = useState([]);
+  const [filteredShipments, setFilteredShipments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Filter states
+  const [selectedShipments, setSelectedShipments] = useState([]);
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [selectedCountries, setSelectedCountries] = useState([]);
+  const [selectedProcesses, setSelectedProcesses] = useState([]);
+  const [selectedFlows, setSelectedFlows] = useState([]);
+
+  // Options for filters
+  const [shipmentOptions, setShipmentOptions] = useState([]);
+  const [dateOptions, setDateOptions] = useState([]);
+  const [countryOptions, setCountryOptions] = useState([]);
+  const [processOptions, setProcessOptions] = useState([]);
+  const [flowOptions, setFlowOptions] = useState([]);
+
+  const updateFilterOptions = (data) => {
+    const uniqueValues = {
+      shipments: new Set(),
+      dates: new Set(),
+      countries: new Set(),
+      processes: new Set(),
+      flows: new Set(),
+    };
+
+    data.forEach(item => {
+      uniqueValues.shipments.add(item.shipment);
+      uniqueValues.dates.add(item.shipment_end_date);
+      uniqueValues.countries.add(item.country);
+      uniqueValues.processes.add(item.process);
+      uniqueValues.flows.add(item.flow);
+    });
+
+    // Convert to react-select format
+    setShipmentOptions([...uniqueValues.shipments].map(value => ({ value, label: value })));
+    setDateOptions([...uniqueValues.dates].map(value => ({ 
+      value, 
+      label: value !== 'N/A' 
+        ? `${value.slice(0,2)}.${value.slice(2,4)}.${value.slice(4)}` 
+        : 'N/A' 
+    })).sort((a, b) => a.value.localeCompare(b.value)));
+    setCountryOptions([...uniqueValues.countries].map(value => ({ value, label: value })));
+    setProcessOptions([...uniqueValues.processes].map(value => ({ value, label: value })));
+    setFlowOptions([...uniqueValues.flows].map(value => ({ value, label: value })));
+  };
+
+  const applyFilters = () => {
+    let filtered = [...shipments];
+
+    // Apply each filter if values are selected
+    if (selectedShipments.length > 0) {
+      filtered = filtered.filter(item => 
+        selectedShipments.some(selected => selected.value === item.shipment)
+      );
+    }
+    if (selectedDates.length > 0) {
+      filtered = filtered.filter(item => 
+        selectedDates.some(selected => selected.value === item.shipment_end_date)
+      );
+    }
+    if (selectedCountries.length > 0) {
+      filtered = filtered.filter(item => 
+        selectedCountries.some(selected => selected.value === item.country)
+      );
+    }
+    if (selectedProcesses.length > 0) {
+      filtered = filtered.filter(item => 
+        selectedProcesses.some(selected => selected.value === item.process)
+      );
+    }
+    if (selectedFlows.length > 0) {
+      filtered = filtered.filter(item => 
+        selectedFlows.some(selected => selected.value === item.flow)
+      );
+    }
+
+    // Sort by end date
+    filtered.sort((a, b) => a.shipment_end_date.localeCompare(b.shipment_end_date));
+
+    // Update filter options based on current filtered data
+    updateFilterOptions(filtered);
+    setFilteredShipments(filtered);
+  };
+
+  useEffect(() => {
+    applyFilters();
+  }, [selectedShipments, selectedDates, selectedCountries, selectedProcesses, selectedFlows]);
 
   useEffect(() => {
     fetchShipmentData();
@@ -74,6 +162,8 @@ const DashboardCVGA = () => {
           }));
         
         setShipments(validData);
+        setFilteredShipments(validData);
+        updateFilterOptions(validData);
       } catch (parseError) {
         console.error('Parse error:', parseError);
         setError('Failed to parse shipment data. Please try again.');
@@ -159,6 +249,224 @@ const DashboardCVGA = () => {
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-4 mb-6">
+        <div className="w-48">
+          <label className="block text-sm font-medium text-gray-300 mb-1">Shipment Number</label>
+          <Select
+            isMulti
+            options={shipmentOptions}
+            value={selectedShipments}
+            onChange={setSelectedShipments}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            styles={{
+              control: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+                borderColor: '#374151',
+              }),
+              menu: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
+                color: '#d1d5db',
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: '#374151',
+              }),
+              multiValueLabel: (base) => ({
+                ...base,
+                color: '#d1d5db',
+              }),
+              multiValueRemove: (base) => ({
+                ...base,
+                color: '#d1d5db',
+                ':hover': {
+                  backgroundColor: '#4b5563',
+                  color: '#fff',
+                },
+              }),
+            }}
+          />
+        </div>
+        <div className="w-48">
+          <label className="block text-sm font-medium text-gray-300 mb-1">End Date</label>
+          <Select
+            isMulti
+            options={dateOptions}
+            value={selectedDates}
+            onChange={setSelectedDates}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            styles={{
+              control: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+                borderColor: '#374151',
+              }),
+              menu: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
+                color: '#d1d5db',
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: '#374151',
+              }),
+              multiValueLabel: (base) => ({
+                ...base,
+                color: '#d1d5db',
+              }),
+              multiValueRemove: (base) => ({
+                ...base,
+                color: '#d1d5db',
+                ':hover': {
+                  backgroundColor: '#4b5563',
+                  color: '#fff',
+                },
+              }),
+            }}
+          />
+        </div>
+        <div className="w-48">
+          <label className="block text-sm font-medium text-gray-300 mb-1">Country</label>
+          <Select
+            isMulti
+            options={countryOptions}
+            value={selectedCountries}
+            onChange={setSelectedCountries}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            styles={{
+              control: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+                borderColor: '#374151',
+              }),
+              menu: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
+                color: '#d1d5db',
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: '#374151',
+              }),
+              multiValueLabel: (base) => ({
+                ...base,
+                color: '#d1d5db',
+              }),
+              multiValueRemove: (base) => ({
+                ...base,
+                color: '#d1d5db',
+                ':hover': {
+                  backgroundColor: '#4b5563',
+                  color: '#fff',
+                },
+              }),
+            }}
+          />
+        </div>
+        <div className="w-48">
+          <label className="block text-sm font-medium text-gray-300 mb-1">Process</label>
+          <Select
+            isMulti
+            options={processOptions}
+            value={selectedProcesses}
+            onChange={setSelectedProcesses}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            styles={{
+              control: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+                borderColor: '#374151',
+              }),
+              menu: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
+                color: '#d1d5db',
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: '#374151',
+              }),
+              multiValueLabel: (base) => ({
+                ...base,
+                color: '#d1d5db',
+              }),
+              multiValueRemove: (base) => ({
+                ...base,
+                color: '#d1d5db',
+                ':hover': {
+                  backgroundColor: '#4b5563',
+                  color: '#fff',
+                },
+              }),
+            }}
+          />
+        </div>
+        <div className="w-48">
+          <label className="block text-sm font-medium text-gray-300 mb-1">Flow</label>
+          <Select
+            isMulti
+            options={flowOptions}
+            value={selectedFlows}
+            onChange={setSelectedFlows}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            styles={{
+              control: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+                borderColor: '#374151',
+              }),
+              menu: (base) => ({
+                ...base,
+                backgroundColor: '#1f2937',
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
+                color: '#d1d5db',
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: '#374151',
+              }),
+              multiValueLabel: (base) => ({
+                ...base,
+                color: '#d1d5db',
+              }),
+              multiValueRemove: (base) => ({
+                ...base,
+                color: '#d1d5db',
+                ':hover': {
+                  backgroundColor: '#4b5563',
+                  color: '#fff',
+                },
+              }),
+            }}
+          />
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="flex justify-center items-center h-screen">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
@@ -205,7 +513,7 @@ const DashboardCVGA = () => {
                 </tr>
               </thead>
               <tbody className="bg-gray-900 divide-y divide-gray-700">
-                {shipments.map((shipment, index) => (
+                {filteredShipments.map((shipment, index) => (
                   <tr key={index} className="hover:bg-gray-800">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       {shipment.shipment}
