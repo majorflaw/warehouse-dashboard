@@ -52,3 +52,6 @@
         * is_check -> here we need an icon to show if the value is true, that represents 100% check needed.
         * is_vas -> an icon that shows if the value is true, that can represent Value Added Service.
         * is_dg -> an icon that shows if the value is true, that the shipment contains Dangerous Goods.
+    
+# 7. A Flow Pages (7)
+* Change the style of the dashboards to apply the same styles as the main page. A dark theme.
