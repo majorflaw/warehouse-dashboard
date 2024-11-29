@@ -182,10 +182,10 @@ const DashboardMSA = () => {
                     Process
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Quantity
+                    Flow
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Flow
+                    Lines
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                     HU
@@ -197,7 +197,7 @@ const DashboardMSA = () => {
                     TO Packed
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Lines
+                    Quantity
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                     Status
@@ -233,10 +233,10 @@ const DashboardMSA = () => {
                       {shipment.process}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {shipment.total_quantity}
+                      {shipment.flow}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {shipment.flow}
+                      {`${shipment.picked_lines}/${shipment.total_lines}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       {`${shipment.total_hu_closed}/${shipment.total_hu}`}
@@ -248,7 +248,7 @@ const DashboardMSA = () => {
                       {`${shipment.tos_packed}/${shipment.total_lines}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {`${shipment.picked_lines}/${shipment.total_lines}`}
+                      {shipment.total_quantity}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       <div className="flex items-center space-x-2">
