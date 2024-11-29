@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/warehouse-dashboard/static/css/main.0fd80104.css",
-    "main.js": "/warehouse-dashboard/static/js/main.6cb6c9af.js",
+    "main.css": "/warehouse-dashboard/static/css/main.670d2d48.css",
+    "main.js": "/warehouse-dashboard/static/js/main.6b7e0d71.js",
     "static/js/453.b7b5e70c.chunk.js": "/warehouse-dashboard/static/js/453.b7b5e70c.chunk.js",
     "index.html": "/warehouse-dashboard/index.html",
-    "main.0fd80104.css.map": "/warehouse-dashboard/static/css/main.0fd80104.css.map",
-    "main.6cb6c9af.js.map": "/warehouse-dashboard/static/js/main.6cb6c9af.js.map",
+    "main.670d2d48.css.map": "/warehouse-dashboard/static/css/main.670d2d48.css.map",
+    "main.6b7e0d71.js.map": "/warehouse-dashboard/static/js/main.6b7e0d71.js.map",
     "453.b7b5e70c.chunk.js.map": "/warehouse-dashboard/static/js/453.b7b5e70c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0fd80104.css",
-    "static/js/main.6cb6c9af.js"
+    "static/css/main.670d2d48.css",
+    "static/js/main.6b7e0d71.js"
   ]
 }
