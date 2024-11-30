@@ -7,22 +7,24 @@ const DashboardCVGB = () => {
   const [error, setError] = useState(null);
   const [dateFilter, setDateFilter] = useState('ALL');
 
-  const formatDate = (dateStr) => {
-    if (!dateStr || dateStr === 'N/A' || typeof dateStr !== 'string') return 'N/A';
-    // Input: DDMMYYYY, Output: DD.MM.YYYY
+  const formatDate = (dateVal) => {
+    if (!dateVal) return 'N/A';
+    // Convert number to string and pad with zeros
+    const dateStr = dateVal.toString().padStart(8, '0');
     return `${dateStr.slice(0, 2)}.${dateStr.slice(2, 4)}.${dateStr.slice(4)}`;
   };
 
-  const formatTime = (timeStr) => {
-    if (!timeStr || timeStr === 'N/A' || typeof timeStr !== 'string') return 'N/A';
-    // Input: HHMMSS, Output: HH:MM
+  const formatTime = (timeVal) => {
+    if (!timeVal) return 'N/A';
+    // Convert number to string and pad with zeros
+    const timeStr = timeVal.toString().padStart(6, '0');
     return `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}`;
   };
 
-  const getDateFromString = (dateStr) => {
-    if (!dateStr || dateStr === 'N/A' || typeof dateStr !== 'string') {
-      return new Date(0); // Return a default date for invalid inputs
-    }
+  const getDateFromString = (dateVal) => {
+    if (!dateVal) return new Date(0);
+    // Convert number to string and pad with zeros
+    const dateStr = dateVal.toString().padStart(8, '0');
     // Input: DDMMYYYY
     const year = parseInt(dateStr.slice(4));
     const month = parseInt(dateStr.slice(2, 4)) - 1;
@@ -35,7 +37,7 @@ const DashboardCVGB = () => {
     const dd = String(today.getDate()).padStart(2, '0');
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy = today.getFullYear();
-    return dd + mm + yyyy;
+    return parseInt(dd + mm + yyyy);
   };
 
   const getTomorrowString = () => {
@@ -44,7 +46,7 @@ const DashboardCVGB = () => {
     const dd = String(tomorrow.getDate()).padStart(2, '0');
     const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
     const yyyy = tomorrow.getFullYear();
-    return dd + mm + yyyy;
+    return parseInt(dd + mm + yyyy);
   };
 
   const filterShipmentsByDate = (data) => {
@@ -67,36 +69,9 @@ const DashboardCVGB = () => {
   };
 
   const sortByDate = (data) => {
-    if (!Array.isArray(data)) {
-      try {
-        data = JSON.parse(data);
-      } catch (e) {
-        console.error('Failed to parse data:', e);
-        return [];
-      }
-    }
-    
-    return data.sort((a, b) => {
+    return [...data].sort((a, b) => {
       if (!a.cuttoff_dt || !b.cuttoff_dt) return 0;
-      
-      const dateA = a.cuttoff_dt; // DDMMYYYY format
-      const dateB = b.cuttoff_dt;
-
-      // Extract year, month, day
-      const yearA = dateA.slice(4);
-      const monthA = dateA.slice(2, 4);
-      const dayA = dateA.slice(0, 2);
-
-      const yearB = dateB.slice(4);
-      const monthB = dateB.slice(2, 4);
-      const dayB = dateB.slice(0, 2);
-
-      // Compare year first
-      if (yearA !== yearB) return yearA - yearB;
-      // If years are equal, compare months
-      if (monthA !== monthB) return monthA - monthB;
-      // If months are equal, compare days
-      return dayA - dayB;
+      return a.cuttoff_dt - b.cuttoff_dt;  // Direct numeric comparison
     });
   };
 
@@ -143,12 +118,14 @@ const DashboardCVGB = () => {
             .filter(item => item && typeof item === 'object')
             .map(item => ({
               delivery: item.delivery?.toString() || 'N/A',
-              cuttoff_dt: item.cuttoff_dt || 'N/A',
-              cutoff_tm: item.cutoff_tm || 'N/A',
+              cuttoff_dt: item.cuttoff_dt || null,  // Keep as number
+              cutoff_tm: item.cutoff_tm || null,    // Keep as number
               country: item.country || 'N/A',
               flow: item.flow || 'N/A'
             }));
 
+          console.log('Sample data:', validData[0]); // Debug log
+          
           const sortedData = sortByDate(validData);
           setShipments(sortedData);
           setFilteredShipments(sortedData);
