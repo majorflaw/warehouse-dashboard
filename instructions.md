@@ -71,3 +71,6 @@
 
 # 10. A Flow Pages (10)
 * Remove the cards where is "Total Shipments", "With Issue", "On Track", "Average Progress"
+
+# 11. A Flow Pages (11)
+* Change the style of the page. Make it even more dark. We should really create a dark theme for this dashboard. The icons are good in this colors, but I don't really want this blueish color.

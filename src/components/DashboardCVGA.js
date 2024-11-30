@@ -181,12 +181,12 @@ const DashboardCVGA = () => {
   }, [dateFilter, shipments]);
 
   return (
-    <div className="p-6 bg-gray-900 min-h-screen">
+    <div className="p-6 bg-[#121212] min-h-screen">
       <div className="mb-6">
         <select
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value)}
-          className="bg-gray-800 text-gray-300 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-[#1E1E1E] text-gray-300 border border-[#2D2D2D] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#404040] hover:border-[#404040] transition-colors"
         >
           <option value="ALL">ALL</option>
           <option value="TODAY">TODAY</option>
@@ -198,14 +198,14 @@ const DashboardCVGA = () => {
 
       {isLoading ? (
         <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#404040]"></div>
         </div>
       ) : error ? (
-        <div className="flex items-center justify-center h-[calc(100vh-8rem)] text-red-500">
+        <div className="flex items-center justify-center h-[calc(100vh-8rem)] text-red-400">
           {error}
         </div>
       ) : (
-        <div className="bg-gray-800 rounded-lg overflow-hidden">
+        <div className="bg-[#1E1E1E] rounded-lg overflow-hidden border border-[#2D2D2D]">
           <div className="overflow-x-auto">
             <div className="inline-block min-w-full">
               <div className="h-[calc(100vh-8rem)] overflow-auto">
@@ -215,55 +215,55 @@ const DashboardCVGA = () => {
                   </div>
                 ) : (
                   <table className="min-w-full">
-                    <thead className="bg-gray-900 sticky top-0">
+                    <thead className="bg-[#181818] sticky top-0">
                       <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           Shipment Number
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           End Date
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           Country
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           Process
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           Flow
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           Lines
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           HU
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           HU Nested
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           TO Packed
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           Quantity
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-[#2D2D2D]">
                           Status
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-gray-800 divide-y divide-gray-700">
+                    <tbody className="bg-[#1E1E1E] divide-y divide-[#2D2D2D]">
                       {filteredShipments.map((shipment, index) => (
-                        <tr key={index} className="hover:bg-gray-700">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        <tr key={index} className="hover:bg-[#252525] transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {shipment.shipment}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {shipment.shipment_end_date !== 'N/A' 
                               ? formatDate(shipment.shipment_end_date)
                               : 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {shipment.country !== 'N/A' ? (
                               <div className="flex items-center">
                                 <img
@@ -277,28 +277,28 @@ const DashboardCVGA = () => {
                               'N/A'
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {shipment.process}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {shipment.flow}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {`${shipment.picked_lines}/${shipment.total_lines}`}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {`${shipment.total_hu_closed}/${shipment.total_hu}`}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {`${shipment.hu_nested}/${shipment.total_hu}`}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {`${shipment.tos_packed}/${shipment.total_lines}`}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {shipment.total_quantity}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             <div className="flex items-center space-x-2">
                               {/* Created Status */}
                               <FontAwesomeIcon 
@@ -321,13 +321,13 @@ const DashboardCVGA = () => {
                               
                               {/* Transport Way */}
                               {shipment.transport_way === 'AIR' && (
-                                <FontAwesomeIcon icon={faPlane} className="text-blue-500" />
+                                <FontAwesomeIcon icon={faPlane} className="text-gray-500" />
                               )}
                               {shipment.transport_way === 'ROAD' && (
-                                <FontAwesomeIcon icon={faTruck} className="text-blue-500" />
+                                <FontAwesomeIcon icon={faTruck} className="text-gray-500" />
                               )}
                               {shipment.transport_way === 'OCEAN' && (
-                                <FontAwesomeIcon icon={faShip} className="text-blue-500" />
+                                <FontAwesomeIcon icon={faShip} className="text-gray-500" />
                               )}
                               
                               {/* Check Status */}
@@ -356,7 +356,7 @@ const DashboardCVGA = () => {
           </div>
         </div>
       )}
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-400">{error}</p>}
     </div>
   );
 };
