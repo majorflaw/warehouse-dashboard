@@ -8,184 +8,57 @@ const DashboardCVGA = () => {
   const [filteredShipments, setFilteredShipments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Filter states
-  const [selectedShipments, setSelectedShipments] = useState([]);
-  const [selectedDates, setSelectedDates] = useState([]);
-  const [selectedCountries, setSelectedCountries] = useState([]);
-  const [selectedProcesses, setSelectedProcesses] = useState([]);
-  const [selectedFlows, setSelectedFlows] = useState([]);
 
-  // Options for filters
-  const [shipmentOptions, setShipmentOptions] = useState([]);
-  const [dateOptions, setDateOptions] = useState([]);
-  const [countryOptions, setCountryOptions] = useState([]);
-  const [processOptions, setProcessOptions] = useState([]);
-  const [flowOptions, setFlowOptions] = useState([]);
+  const formatDate = (dateStr) => {
+    // Input: DDMMYYYY, Output: DD.MM.YYYY
+    return `${dateStr.slice(0, 2)}.${dateStr.slice(2, 4)}.${dateStr.slice(4)}`;
+  };
 
-  const updateFilterOptions = (data) => {
-    const uniqueValues = {
-      shipments: new Set(),
-      dates: new Set(),
-      countries: new Set(),
-      processes: new Set(),
-      flows: new Set(),
+  const sortByDate = (data) => {
+    return data.sort((a, b) => {
+      const dateA = a.shipment_end_date; // DDMMYYYY format
+      const dateB = b.shipment_end_date; // DDMMYYYY format
+
+      // Extract year, month, day
+      const yearA = dateA.slice(4);
+      const monthA = dateA.slice(2, 4);
+      const dayA = dateA.slice(0, 2);
+
+      const yearB = dateB.slice(4);
+      const monthB = dateB.slice(2, 4);
+      const dayB = dateB.slice(0, 2);
+
+      // Compare year first
+      if (yearA !== yearB) return yearA - yearB;
+      // If years are equal, compare months
+      if (monthA !== monthB) return monthA - monthB;
+      // If months are equal, compare days
+      return dayA - dayB;
+    });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('https://warehouse-data-server.onrender.com/api/testing_cvg/a_flow_shipment_data.json');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        let data = await response.json();
+        data = sortByDate(data);
+        setShipments(data);
+        setFilteredShipments(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError(error.message);
+        setIsLoading(false);
+      }
     };
 
-    data.forEach(item => {
-      uniqueValues.shipments.add(item.shipment);
-      uniqueValues.dates.add(item.shipment_end_date);
-      uniqueValues.countries.add(item.country);
-      uniqueValues.processes.add(item.process);
-      uniqueValues.flows.add(item.flow);
-    });
-
-    // Convert to react-select format
-    const uniqueShipments = [...uniqueValues.shipments].map(value => ({
-      value,
-      label: value
-    }));
-
-    const uniqueDates = [...uniqueValues.dates].map(value => ({
-      value,
-      label: value
-    })).sort((a, b) => {
-      const [dayA, monthA, yearA] = a.value.split('.');
-      const [dayB, monthB, yearB] = b.value.split('.');
-      const dateA = new Date(yearA, monthA - 1, dayA);
-      const dateB = new Date(yearB, monthB - 1, dayB);
-      return dateA - dateB;
-    });
-
-    const uniqueCountries = [...uniqueValues.countries].map(value => ({
-      value,
-      label: value
-    }));
-
-    const uniqueProcesses = [...uniqueValues.processes].map(value => ({
-      value,
-      label: value
-    }));
-
-    const uniqueFlows = [...uniqueValues.flows].map(value => ({
-      value,
-      label: value
-    }));
-
-    setShipmentOptions(uniqueShipments);
-    setDateOptions(uniqueDates);
-    setCountryOptions(uniqueCountries);
-    setProcessOptions(uniqueProcesses);
-    setFlowOptions(uniqueFlows);
-  };
-
-  const filterData = (data) => {
-    return data.filter(item => {
-      const shipmentMatch = selectedShipments.length === 0 || selectedShipments.some(s => s.value === item.shipment);
-      const dateMatch = selectedDates.length === 0 || selectedDates.some(d => d.value === item.shipment_end_date);
-      const countryMatch = selectedCountries.length === 0 || selectedCountries.some(c => c.value === item.country);
-      const processMatch = selectedProcesses.length === 0 || selectedProcesses.some(p => p.value === item.process);
-      const flowMatch = selectedFlows.length === 0 || selectedFlows.some(f => f.value === item.flow);
-
-      return shipmentMatch && dateMatch && countryMatch && processMatch && flowMatch;
-    }).sort((a, b) => {
-      const [dayA, monthA, yearA] = a.shipment_end_date.split('.');
-      const [dayB, monthB, yearB] = b.shipment_end_date.split('.');
-      const dateA = new Date(yearA, monthA - 1, dayA);
-      const dateB = new Date(yearB, monthB - 1, dayB);
-      return dateA - dateB;
-    });
-  };
-
-  const applyFilters = () => {
-    const filtered = filterData(shipments);
-    setFilteredShipments(filtered);
-  };
-
-  useEffect(() => {
-    applyFilters();
-  }, [selectedShipments, selectedDates, selectedCountries, selectedProcesses, selectedFlows]);
-
-  useEffect(() => {
-    fetchShipmentData();
+    fetchData();
   }, []);
-
-  const fetchShipmentData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const response = await fetch(
-        'https://warehouse-data-server.onrender.com/api/testing-cvg/a_flow_shipment_data.json'
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const text = await response.text();
-      
-      try {
-        // Remove the outer quotes and unescape the inner quotes
-        let cleanedText = text.trim();
-        if (cleanedText.startsWith('"') && cleanedText.endsWith('"')) {
-          cleanedText = cleanedText.slice(1, -1);
-        }
-        
-        // Replace invalid JSON values and clean up the string
-        cleanedText = cleanedText
-          .replace(/\\"/g, '"')
-          .replace(/\\n/g, '')
-          .replace(/: NaN/g, ': null')
-          .replace(/: Infinity/g, ': null')
-          .replace(/: -Infinity/g, ': null');
-        
-        // Parse the cleaned JSON
-        const data = JSON.parse(cleanedText);
-        
-        if (!Array.isArray(data)) {
-          throw new Error('Expected array of shipments');
-        }
-        
-        // Map the data to our required format
-        const validData = data
-          .filter(item => item && typeof item === 'object')
-          .map(item => ({
-            shipment: item.shipment?.toString() || 'N/A',
-            shipment_end_date: item.shipment_end_date || 'N/A',
-            country: item.country || 'N/A',
-            process: item.process || 'N/A',
-            total_quantity: item.total_quantity?.toString() || 'N/A',
-            flow: item.flow || 'N/A',
-            total_hu_closed: item.total_hu_closed?.toString() || '0',
-            total_hu: item.total_hu?.toString() || '0',
-            hu_nested: item.hu_nested?.toString() || '0',
-            tos_packed: item.tos_packed?.toString() || '0',
-            total_lines: item.total_lines?.toString() || '0',
-            picked_lines: item.picked_lines?.toString() || '0',
-            is_created: item.is_created || false,
-            is_issue: item.is_issue || false,
-            issue_count: item.issue_count || 0,
-            transport_way: item.transport_way || 'N/A',
-            is_check: item.is_check || false,
-            is_vas: item.is_vas || false,
-            is_dg: item.is_dg || false
-          }));
-        
-        setShipments(validData);
-        setFilteredShipments(validData);
-        updateFilterOptions(validData);
-      } catch (parseError) {
-        console.error('Parse error:', parseError);
-        setError('Failed to parse shipment data. Please try again.');
-      }
-    } catch (err) {
-      console.error('Fetch error:', err);
-      setError(`Failed to load data: ${err.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen">
@@ -260,289 +133,6 @@ const DashboardCVGA = () => {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 mb-6">
-        <div className="w-48">
-          <label className="block text-sm font-medium text-gray-300 mb-1">Shipment Number</label>
-          <Select
-            isMulti
-            options={shipmentOptions}
-            value={selectedShipments}
-            onChange={setSelectedShipments}
-            className="react-select-container"
-            classNamePrefix="react-select"
-            styles={{
-              control: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-                borderColor: '#374151',
-                minHeight: '38px',
-                height: '38px',
-              }),
-              valueContainer: (base) => ({
-                ...base,
-                height: '38px',
-                padding: '0 6px',
-                maxHeight: '38px',
-                overflowY: 'auto',
-              }),
-              menu: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-              }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
-                color: '#d1d5db',
-              }),
-              multiValue: (base) => ({
-                ...base,
-                backgroundColor: '#374151',
-              }),
-              multiValueLabel: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-              multiValueRemove: (base) => ({
-                ...base,
-                color: '#d1d5db',
-                ':hover': {
-                  backgroundColor: '#4b5563',
-                  color: '#fff',
-                },
-              }),
-              input: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-            }}
-          />
-        </div>
-        <div className="w-48">
-          <label className="block text-sm font-medium text-gray-300 mb-1">End Date</label>
-          <Select
-            isMulti
-            options={dateOptions}
-            value={selectedDates}
-            onChange={setSelectedDates}
-            className="react-select-container"
-            classNamePrefix="react-select"
-            styles={{
-              control: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-                borderColor: '#374151',
-                minHeight: '38px',
-                height: '38px',
-              }),
-              valueContainer: (base) => ({
-                ...base,
-                height: '38px',
-                padding: '0 6px',
-                maxHeight: '38px',
-                overflowY: 'auto',
-              }),
-              menu: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-              }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
-                color: '#d1d5db',
-              }),
-              multiValue: (base) => ({
-                ...base,
-                backgroundColor: '#374151',
-              }),
-              multiValueLabel: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-              multiValueRemove: (base) => ({
-                ...base,
-                color: '#d1d5db',
-                ':hover': {
-                  backgroundColor: '#4b5563',
-                  color: '#fff',
-                },
-              }),
-              input: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-            }}
-          />
-        </div>
-        <div className="w-48">
-          <label className="block text-sm font-medium text-gray-300 mb-1">Country</label>
-          <Select
-            isMulti
-            options={countryOptions}
-            value={selectedCountries}
-            onChange={setSelectedCountries}
-            className="react-select-container"
-            classNamePrefix="react-select"
-            styles={{
-              control: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-                borderColor: '#374151',
-                minHeight: '38px',
-                height: '38px',
-              }),
-              valueContainer: (base) => ({
-                ...base,
-                height: '38px',
-                padding: '0 6px',
-                maxHeight: '38px',
-                overflowY: 'auto',
-              }),
-              menu: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-              }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
-                color: '#d1d5db',
-              }),
-              multiValue: (base) => ({
-                ...base,
-                backgroundColor: '#374151',
-              }),
-              multiValueLabel: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-              multiValueRemove: (base) => ({
-                ...base,
-                color: '#d1d5db',
-                ':hover': {
-                  backgroundColor: '#4b5563',
-                  color: '#fff',
-                },
-              }),
-              input: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-            }}
-          />
-        </div>
-        <div className="w-48">
-          <label className="block text-sm font-medium text-gray-300 mb-1">Process</label>
-          <Select
-            isMulti
-            options={processOptions}
-            value={selectedProcesses}
-            onChange={setSelectedProcesses}
-            className="react-select-container"
-            classNamePrefix="react-select"
-            styles={{
-              control: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-                borderColor: '#374151',
-                minHeight: '38px',
-                height: '38px',
-              }),
-              valueContainer: (base) => ({
-                ...base,
-                height: '38px',
-                padding: '0 6px',
-                maxHeight: '38px',
-                overflowY: 'auto',
-              }),
-              menu: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-              }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
-                color: '#d1d5db',
-              }),
-              multiValue: (base) => ({
-                ...base,
-                backgroundColor: '#374151',
-              }),
-              multiValueLabel: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-              multiValueRemove: (base) => ({
-                ...base,
-                color: '#d1d5db',
-                ':hover': {
-                  backgroundColor: '#4b5563',
-                  color: '#fff',
-                },
-              }),
-              input: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-            }}
-          />
-        </div>
-        <div className="w-48">
-          <label className="block text-sm font-medium text-gray-300 mb-1">Flow</label>
-          <Select
-            isMulti
-            options={flowOptions}
-            value={selectedFlows}
-            onChange={setSelectedFlows}
-            className="react-select-container"
-            classNamePrefix="react-select"
-            styles={{
-              control: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-                borderColor: '#374151',
-                minHeight: '38px',
-                height: '38px',
-              }),
-              valueContainer: (base) => ({
-                ...base,
-                height: '38px',
-                padding: '0 6px',
-                maxHeight: '38px',
-                overflowY: 'auto',
-              }),
-              menu: (base) => ({
-                ...base,
-                backgroundColor: '#1f2937',
-              }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isFocused ? '#374151' : '#1f2937',
-                color: '#d1d5db',
-              }),
-              multiValue: (base) => ({
-                ...base,
-                backgroundColor: '#374151',
-              }),
-              multiValueLabel: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-              multiValueRemove: (base) => ({
-                ...base,
-                color: '#d1d5db',
-                ':hover': {
-                  backgroundColor: '#4b5563',
-                  color: '#fff',
-                },
-              }),
-              input: (base) => ({
-                ...base,
-                color: '#d1d5db',
-              }),
-            }}
-          />
-        </div>
-      </div>
-
       {isLoading ? (
         <div className="flex justify-center items-center h-screen">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
@@ -596,7 +186,7 @@ const DashboardCVGA = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       {shipment.shipment_end_date !== 'N/A' 
-                        ? `${shipment.shipment_end_date.slice(0,2)}.${shipment.shipment_end_date.slice(2,4)}.${shipment.shipment_end_date.slice(4)}`
+                        ? formatDate(shipment.shipment_end_date)
                         : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
