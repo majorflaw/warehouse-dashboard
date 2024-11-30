@@ -55,13 +55,13 @@ const DashboardCVGB = () => {
 
     switch (dateFilter) {
       case 'TODAY':
-        return data.filter(item => item.cuttoff_dt === today);
+        return data.filter(item => item.cutoff_dt === today);
       case 'TOMORROW':
-        return data.filter(item => item.cuttoff_dt === tomorrow);
+        return data.filter(item => item.cutoff_dt === tomorrow);
       case 'BACKLOG':
-        return data.filter(item => getDateFromString(item.cuttoff_dt) < getDateFromString(today));
+        return data.filter(item => getDateFromString(item.cutoff_dt) < getDateFromString(today));
       case 'ALL FUTURE':
-        return data.filter(item => getDateFromString(item.cuttoff_dt) > getDateFromString(today));
+        return data.filter(item => getDateFromString(item.cutoff_dt) > getDateFromString(today));
       case 'ALL':
       default:
         return data;
@@ -70,8 +70,8 @@ const DashboardCVGB = () => {
 
   const sortByDate = (data) => {
     return [...data].sort((a, b) => {
-      if (!a.cuttoff_dt || !b.cuttoff_dt) return 0;
-      return a.cuttoff_dt - b.cuttoff_dt;  // Direct numeric comparison
+      if (!a.cutoff_dt || !b.cutoff_dt) return 0;
+      return a.cutoff_dt - b.cutoff_dt;  // Direct numeric comparison
     });
   };
 
@@ -128,7 +128,7 @@ const DashboardCVGB = () => {
           
           const sortedData = sortByDate(validData);
           setShipments(sortedData);
-          setFilteredShipments(sortedData);
+          setFilteredShipments(filterShipmentsByDate(sortedData));
         } catch (parseError) {
           console.error('Parse error:', parseError);
           setError('Failed to parse delivery data. Please try again.');
@@ -142,13 +142,10 @@ const DashboardCVGB = () => {
     };
 
     fetchData();
-  }, []);
+  }, [dateFilter]);
 
   useEffect(() => {
-    if (shipments.length > 0) {
-      const filteredData = filterShipmentsByDate(shipments);
-      setFilteredShipments(filteredData);
-    }
+    setFilteredShipments(filterShipmentsByDate(shipments));
   }, [dateFilter, shipments]);
 
   return (
@@ -212,7 +209,7 @@ const DashboardCVGB = () => {
                             {shipment.delivery}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                            {formatDate(shipment.cuttoff_dt)}
+                            {formatDate(shipment.cutoff_dt)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {formatTime(shipment.cutoff_tm)}
