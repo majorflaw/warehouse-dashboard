@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
 import DashboardCVGA from './components/DashboardCVGA';
 import DashboardMSA from './components/DashboardMSA';
+import DashboardCVGB from './components/DashboardCVGB';
 
 // Main Welcome Page
 const WelcomePage = () => {
@@ -43,6 +44,8 @@ const FlowSelectionPage = () => {
       navigate('/flow/ms-a');
     } else if (id === 'cvg' && flow === 'a') {
       navigate('/flow/cvg-a');
+    } else if (id === 'cvg' && flow === 'b') {
+      navigate('/flow/cvg-b');
     } else {
       navigate(`/flow/${flow}`);
     }
@@ -105,9 +108,10 @@ function App() {
       <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/department/:id" element={<FlowSelectionPage />} />
-        <Route path="/flow/:id" element={<FlowPage />} />
         <Route path="/flow/ms-a" element={<DashboardMSA />} />
         <Route path="/flow/cvg-a" element={<DashboardCVGA />} />
+        <Route path="/flow/cvg-b" element={<DashboardCVGB />} />
+        <Route path="/flow/:id" element={<FlowPage />} />
       </Routes>
     </Router>
   );

@@ -72,5 +72,14 @@
 # 10. A Flow Pages (10)
 * Remove the cards where is "Total Shipments", "With Issue", "On Track", "Average Progress"
 
-# 11. A Flow Pages (11)
-* Change the style of the page. Make it even more dark. We should really create a dark theme for this dashboard. The icons are good in this colors, but I don't really want this blueish color.
+# 11. B Flow Pages (1)
+* Create similar page to A Flow Page for B Flow. Create the file as DashboardCVGB.js
+* Fetch from https://warehouse-data-server.onrender.com/api/testing_cvg/b_flow_delivery_data.json
+* Instead of the columns we have now, we will have:
+    * DELIVERY NUMBER -> will be taken from delivery column
+    * CUTT-OFF DATE -> will be taken from cuttoff_dt column (value in there is in DDMMYYYY format, you should convert in DD.MM.YYYY format)
+    * CUTT-OFF TIME -> will be taken from cutoff_tm column (value in there is in HHMMSS format, you should convert in HH:MM:SS format and only show HH:MM)
+    * COUNTRY -> will be taken from country column (of course, you need to keep the flag next to the country code)
+    * FLOW -> will be taken from flow column
+
+    * we will add more columns later.
