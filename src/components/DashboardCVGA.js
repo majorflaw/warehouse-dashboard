@@ -86,7 +86,7 @@ const DashboardCVGA = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('https://warehouse-data-server.onrender.com/api/testing_cvg/a_flow_shipment_data.json');
+        const response = await fetch('https://warehouse-data-server.onrender.com/api/testing-cvg/a_flow_shipment_data.json');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
