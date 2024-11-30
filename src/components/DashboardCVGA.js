@@ -60,6 +60,16 @@ const DashboardCVGA = () => {
   };
 
   const sortByDate = (data) => {
+    if (!Array.isArray(data)) {
+      try {
+        // Try to parse the data if it's a string
+        data = JSON.parse(data);
+      } catch (e) {
+        console.error('Failed to parse data:', e);
+        return [];
+      }
+    }
+    
     return data.sort((a, b) => {
       const dateA = a.shipment_end_date; // DDMMYYYY format
       const dateB = b.shipment_end_date; // DDMMYYYY format
@@ -90,10 +100,24 @@ const DashboardCVGA = () => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        let data = await response.json();
-        data = sortByDate(data);
-        setShipments(data);
-        setFilteredShipments(data);
+        const text = await response.text();
+        let data;
+        try {
+          // Remove any surrounding quotes and clean the JSON string
+          const cleanedText = text.trim().replace(/^"|"$/g, '').replace(/\\"/g, '"');
+          data = JSON.parse(cleanedText);
+        } catch (e) {
+          console.error('Failed to parse JSON:', e);
+          throw new Error('Invalid JSON data');
+        }
+        
+        if (!Array.isArray(data)) {
+          throw new Error('Data is not an array');
+        }
+
+        const sortedData = sortByDate(data);
+        setShipments(sortedData);
+        setFilteredShipments(sortedData);
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
