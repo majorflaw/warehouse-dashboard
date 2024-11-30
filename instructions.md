@@ -57,5 +57,9 @@
 * Change the style of the dashboards to apply the same styles as the main page. A dark theme.
 
 # 8. A Flow Pages (8)
-* Order the shipments by the END DATE column. Example: 28.01.2023 -> 14.02.2024 (earlier to later)
-* On the columns SHIPMENT NUMBER, END DATE, COUNTRY, PROCESS, FLOW add the ability to select a value. So for example you can select what countries you want to see, or what date to see. It should be a dropdown, so you can select more than one at the same time. If you select more than one, it should show the shipments that match all the selected values. It should show you only the available values, so if you select a country, and then for that country exists only one type of PROCESS, it should only show you that you can select that value. All dropdowns should allow multiple choices.
+* Create a dropdown selection menu where you select the following filters:
+    * TODAY -> Shows only shipments that have end date = today
+    * TOMORROW -> Shows only shipments that have end date = tomorrow
+    * BACKLOG -> Shows only shipments that have end date < today (excluding today)
+    * ALL FUTURE -> Shows only shipments that have end date > today (excluding today)
+    * ALL -> Shows all shipments, no matter the end date.

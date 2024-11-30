@@ -8,10 +8,55 @@ const DashboardCVGA = () => {
   const [filteredShipments, setFilteredShipments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [dateFilter, setDateFilter] = useState('ALL');
 
   const formatDate = (dateStr) => {
     // Input: DDMMYYYY, Output: DD.MM.YYYY
     return `${dateStr.slice(0, 2)}.${dateStr.slice(2, 4)}.${dateStr.slice(4)}`;
+  };
+
+  const getDateFromString = (dateStr) => {
+    // Input: DDMMYYYY
+    const year = parseInt(dateStr.slice(4));
+    const month = parseInt(dateStr.slice(2, 4)) - 1;
+    const day = parseInt(dateStr.slice(0, 2));
+    return new Date(year, month, day);
+  };
+
+  const getTodayString = () => {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    return dd + mm + yyyy;
+  };
+
+  const getTomorrowString = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dd = String(tomorrow.getDate()).padStart(2, '0');
+    const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const yyyy = tomorrow.getFullYear();
+    return dd + mm + yyyy;
+  };
+
+  const filterShipmentsByDate = (data) => {
+    const today = getTodayString();
+    const tomorrow = getTomorrowString();
+
+    switch (dateFilter) {
+      case 'TODAY':
+        return data.filter(item => item.shipment_end_date === today);
+      case 'TOMORROW':
+        return data.filter(item => item.shipment_end_date === tomorrow);
+      case 'BACKLOG':
+        return data.filter(item => getDateFromString(item.shipment_end_date) < getDateFromString(today));
+      case 'ALL FUTURE':
+        return data.filter(item => getDateFromString(item.shipment_end_date) > getDateFromString(today));
+      case 'ALL':
+      default:
+        return data;
+    }
   };
 
   const sortByDate = (data) => {
@@ -59,6 +104,13 @@ const DashboardCVGA = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (shipments.length > 0) {
+      const filteredData = filterShipmentsByDate(shipments);
+      setFilteredShipments(filteredData);
+    }
+  }, [dateFilter, shipments]);
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen">
@@ -131,6 +183,20 @@ const DashboardCVGA = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <select
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="bg-gray-800 text-gray-300 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="ALL">ALL</option>
+          <option value="TODAY">TODAY</option>
+          <option value="TOMORROW">TOMORROW</option>
+          <option value="BACKLOG">BACKLOG</option>
+          <option value="ALL FUTURE">ALL FUTURE</option>
+        </select>
       </div>
 
       {isLoading ? (
