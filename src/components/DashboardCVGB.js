@@ -8,16 +8,21 @@ const DashboardCVGB = () => {
   const [dateFilter, setDateFilter] = useState('ALL');
 
   const formatDate = (dateStr) => {
+    if (!dateStr || dateStr === 'N/A' || typeof dateStr !== 'string') return 'N/A';
     // Input: DDMMYYYY, Output: DD.MM.YYYY
     return `${dateStr.slice(0, 2)}.${dateStr.slice(2, 4)}.${dateStr.slice(4)}`;
   };
 
   const formatTime = (timeStr) => {
+    if (!timeStr || timeStr === 'N/A' || typeof timeStr !== 'string') return 'N/A';
     // Input: HHMMSS, Output: HH:MM
     return `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}`;
   };
 
   const getDateFromString = (dateStr) => {
+    if (!dateStr || dateStr === 'N/A' || typeof dateStr !== 'string') {
+      return new Date(0); // Return a default date for invalid inputs
+    }
     // Input: DDMMYYYY
     const year = parseInt(dateStr.slice(4));
     const month = parseInt(dateStr.slice(2, 4)) - 1;
@@ -72,6 +77,8 @@ const DashboardCVGB = () => {
     }
     
     return data.sort((a, b) => {
+      if (!a.cuttoff_dt || !b.cuttoff_dt) return 0;
+      
       const dateA = a.cuttoff_dt; // DDMMYYYY format
       const dateB = b.cuttoff_dt;
 
@@ -131,7 +138,7 @@ const DashboardCVGB = () => {
             throw new Error('Expected array of deliveries');
           }
           
-          // Map the data to our required format
+          // Map the data to our required format and ensure all fields exist
           const validData = data
             .filter(item => item && typeof item === 'object')
             .map(item => ({
@@ -228,14 +235,10 @@ const DashboardCVGB = () => {
                             {shipment.delivery}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                            {shipment.cuttoff_dt !== 'N/A' 
-                              ? formatDate(shipment.cuttoff_dt)
-                              : 'N/A'}
+                            {formatDate(shipment.cuttoff_dt)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                            {shipment.cutoff_tm !== 'N/A'
-                              ? formatTime(shipment.cutoff_tm)
-                              : 'N/A'}
+                            {formatTime(shipment.cutoff_tm)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                             {shipment.country !== 'N/A' ? (
