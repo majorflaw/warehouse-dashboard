@@ -197,159 +197,163 @@ const DashboardCVGA = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       ) : error ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="text-red-500">{error}</div>
+        <div className="flex items-center justify-center h-[calc(100vh-8rem)] text-red-500">
+          {error}
         </div>
       ) : (
-        <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden flex flex-col h-[calc(100vh-16rem)]">
-          {filteredShipments.length === 0 ? (
-            <div className="flex-1 flex justify-center items-center text-gray-300 text-lg">
-              No Shipments Found
-            </div>
-          ) : (
-            <div className="overflow-auto">
-              <table className="min-w-full">
-                <thead className="bg-gray-900 sticky top-0">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Shipment Number
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      End Date
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Country
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Process
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Flow
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Lines
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      HU
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      HU Nested
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      TO Packed
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Quantity
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-gray-800 divide-y divide-gray-700">
-                  {filteredShipments.map((shipment, index) => (
-                    <tr key={index} className="hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {shipment.shipment}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {shipment.shipment_end_date !== 'N/A' 
-                          ? formatDate(shipment.shipment_end_date)
-                          : 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {shipment.country !== 'N/A' ? (
-                          <div className="flex items-center">
-                            <img
-                              src={`https://flagcdn.com/w20/${shipment.country.toLowerCase()}.png`}
-                              alt={shipment.country}
-                              className="w-4 h-4 rounded-full mr-2"
-                            />
-                            {shipment.country}
-                          </div>
-                        ) : (
-                          'N/A'
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {shipment.process}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {shipment.flow}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {`${shipment.picked_lines}/${shipment.total_lines}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {`${shipment.total_hu_closed}/${shipment.total_hu}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {`${shipment.hu_nested}/${shipment.total_hu}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {`${shipment.tos_packed}/${shipment.total_lines}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {shipment.total_quantity}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        <div className="flex items-center space-x-2">
-                          {/* Created Status */}
-                          <FontAwesomeIcon 
-                            icon={shipment.is_created ? faCheck : faTimes}
-                            className={shipment.is_created ? 'text-green-500' : 'text-red-500'}
-                          />
-                          
-                          {/* Issue Status */}
-                          {shipment.is_issue && (
-                            <div className="relative">
+        <div className="bg-gray-800 rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <div className="inline-block min-w-full">
+              <div className="h-[calc(100vh-8rem)] overflow-auto">
+                {filteredShipments.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-gray-400 text-lg">
+                    No Shipments Found
+                  </div>
+                ) : (
+                  <table className="min-w-full">
+                    <thead className="bg-gray-900 sticky top-0">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Shipment Number
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          End Date
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Country
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Process
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Flow
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Lines
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          HU
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          HU Nested
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          TO Packed
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Quantity
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-gray-800 divide-y divide-gray-700">
+                      {filteredShipments.map((shipment, index) => (
+                        <tr key={index} className="hover:bg-gray-700">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {shipment.shipment}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {shipment.shipment_end_date !== 'N/A' 
+                              ? formatDate(shipment.shipment_end_date)
+                              : 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {shipment.country !== 'N/A' ? (
+                              <div className="flex items-center">
+                                <img
+                                  src={`https://flagcdn.com/w20/${shipment.country.toLowerCase()}.png`}
+                                  alt={shipment.country}
+                                  className="w-4 h-4 rounded-full mr-2"
+                                />
+                                {shipment.country}
+                              </div>
+                            ) : (
+                              'N/A'
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {shipment.process}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {shipment.flow}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {`${shipment.picked_lines}/${shipment.total_lines}`}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {`${shipment.total_hu_closed}/${shipment.total_hu}`}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {`${shipment.hu_nested}/${shipment.total_hu}`}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {`${shipment.tos_packed}/${shipment.total_lines}`}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {shipment.total_quantity}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            <div className="flex items-center space-x-2">
+                              {/* Created Status */}
                               <FontAwesomeIcon 
-                                icon={faExclamationTriangle} 
-                                className="text-yellow-500"
+                                icon={shipment.is_created ? faCheck : faTimes}
+                                className={shipment.is_created ? 'text-green-500' : 'text-red-500'}
                               />
-                              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                                {shipment.issue_count}
-                              </span>
+                              
+                              {/* Issue Status */}
+                              {shipment.is_issue && (
+                                <div className="relative">
+                                  <FontAwesomeIcon 
+                                    icon={faExclamationTriangle} 
+                                    className="text-yellow-500"
+                                  />
+                                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                    {shipment.issue_count}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {/* Transport Way */}
+                              {shipment.transport_way === 'AIR' && (
+                                <FontAwesomeIcon icon={faPlane} className="text-blue-500" />
+                              )}
+                              {shipment.transport_way === 'ROAD' && (
+                                <FontAwesomeIcon icon={faTruck} className="text-blue-500" />
+                              )}
+                              {shipment.transport_way === 'OCEAN' && (
+                                <FontAwesomeIcon icon={faShip} className="text-blue-500" />
+                              )}
+                              
+                              {/* Check Status */}
+                              {shipment.is_check && (
+                                <FontAwesomeIcon icon={faMagnifyingGlass} className="text-purple-500" />
+                              )}
+                              
+                              {/* VAS Status */}
+                              {shipment.is_vas && (
+                                <FontAwesomeIcon icon={faBoxOpen} className="text-indigo-500" />
+                              )}
+                              
+                              {/* DG Status */}
+                              {shipment.is_dg && (
+                                <FontAwesomeIcon icon={faExclamationCircle} className="text-orange-500" />
+                              )}
                             </div>
-                          )}
-                          
-                          {/* Transport Way */}
-                          {shipment.transport_way === 'AIR' && (
-                            <FontAwesomeIcon icon={faPlane} className="text-blue-500" />
-                          )}
-                          {shipment.transport_way === 'ROAD' && (
-                            <FontAwesomeIcon icon={faTruck} className="text-blue-500" />
-                          )}
-                          {shipment.transport_way === 'OCEAN' && (
-                            <FontAwesomeIcon icon={faShip} className="text-blue-500" />
-                          )}
-                          
-                          {/* Check Status */}
-                          {shipment.is_check && (
-                            <FontAwesomeIcon icon={faMagnifyingGlass} className="text-purple-500" />
-                          )}
-                          
-                          {/* VAS Status */}
-                          {shipment.is_vas && (
-                            <FontAwesomeIcon icon={faBoxOpen} className="text-indigo-500" />
-                          )}
-                          
-                          {/* DG Status */}
-                          {shipment.is_dg && (
-                            <FontAwesomeIcon icon={faExclamationCircle} className="text-orange-500" />
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
       )}
       {error && <p className="text-red-500">{error}</p>}
