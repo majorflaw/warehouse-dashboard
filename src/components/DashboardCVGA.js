@@ -41,53 +41,64 @@ const DashboardCVGA = () => {
     });
 
     // Convert to react-select format
-    setShipmentOptions([...uniqueValues.shipments].map(value => ({ value, label: value })));
-    setDateOptions([...uniqueValues.dates].map(value => ({ 
-      value, 
-      label: value !== 'N/A' 
-        ? `${value.slice(0,2)}.${value.slice(2,4)}.${value.slice(4)}` 
-        : 'N/A' 
-    })).sort((a, b) => a.value.localeCompare(b.value)));
-    setCountryOptions([...uniqueValues.countries].map(value => ({ value, label: value })));
-    setProcessOptions([...uniqueValues.processes].map(value => ({ value, label: value })));
-    setFlowOptions([...uniqueValues.flows].map(value => ({ value, label: value })));
+    const uniqueShipments = [...uniqueValues.shipments].map(value => ({
+      value,
+      label: value
+    }));
+
+    const uniqueDates = [...uniqueValues.dates].map(value => ({
+      value,
+      label: value
+    })).sort((a, b) => {
+      const [dayA, monthA, yearA] = a.value.split('.');
+      const [dayB, monthB, yearB] = b.value.split('.');
+      const dateA = new Date(yearA, monthA - 1, dayA);
+      const dateB = new Date(yearB, monthB - 1, dayB);
+      return dateA - dateB;
+    });
+
+    const uniqueCountries = [...uniqueValues.countries].map(value => ({
+      value,
+      label: value
+    }));
+
+    const uniqueProcesses = [...uniqueValues.processes].map(value => ({
+      value,
+      label: value
+    }));
+
+    const uniqueFlows = [...uniqueValues.flows].map(value => ({
+      value,
+      label: value
+    }));
+
+    setShipmentOptions(uniqueShipments);
+    setDateOptions(uniqueDates);
+    setCountryOptions(uniqueCountries);
+    setProcessOptions(uniqueProcesses);
+    setFlowOptions(uniqueFlows);
+  };
+
+  const filterData = (data) => {
+    return data.filter(item => {
+      const shipmentMatch = selectedShipments.length === 0 || selectedShipments.some(s => s.value === item.shipment);
+      const dateMatch = selectedDates.length === 0 || selectedDates.some(d => d.value === item.shipment_end_date);
+      const countryMatch = selectedCountries.length === 0 || selectedCountries.some(c => c.value === item.country);
+      const processMatch = selectedProcesses.length === 0 || selectedProcesses.some(p => p.value === item.process);
+      const flowMatch = selectedFlows.length === 0 || selectedFlows.some(f => f.value === item.flow);
+
+      return shipmentMatch && dateMatch && countryMatch && processMatch && flowMatch;
+    }).sort((a, b) => {
+      const [dayA, monthA, yearA] = a.shipment_end_date.split('.');
+      const [dayB, monthB, yearB] = b.shipment_end_date.split('.');
+      const dateA = new Date(yearA, monthA - 1, dayA);
+      const dateB = new Date(yearB, monthB - 1, dayB);
+      return dateA - dateB;
+    });
   };
 
   const applyFilters = () => {
-    let filtered = [...shipments];
-
-    // Apply each filter if values are selected
-    if (selectedShipments.length > 0) {
-      filtered = filtered.filter(item => 
-        selectedShipments.some(selected => selected.value === item.shipment)
-      );
-    }
-    if (selectedDates.length > 0) {
-      filtered = filtered.filter(item => 
-        selectedDates.some(selected => selected.value === item.shipment_end_date)
-      );
-    }
-    if (selectedCountries.length > 0) {
-      filtered = filtered.filter(item => 
-        selectedCountries.some(selected => selected.value === item.country)
-      );
-    }
-    if (selectedProcesses.length > 0) {
-      filtered = filtered.filter(item => 
-        selectedProcesses.some(selected => selected.value === item.process)
-      );
-    }
-    if (selectedFlows.length > 0) {
-      filtered = filtered.filter(item => 
-        selectedFlows.some(selected => selected.value === item.flow)
-      );
-    }
-
-    // Sort by end date
-    filtered.sort((a, b) => a.shipment_end_date.localeCompare(b.shipment_end_date));
-
-    // Update filter options based on current filtered data
-    updateFilterOptions(filtered);
+    const filtered = filterData(shipments);
     setFilteredShipments(filtered);
   };
 
