@@ -63,3 +63,8 @@
     * BACKLOG -> Shows only shipments that have end date < today (excluding today)
     * ALL FUTURE -> Shows only shipments that have end date > today (excluding today)
     * ALL -> Shows all shipments, no matter the end date.
+
+# 9. A Flow Pages (9)
+* If there is no shipment found, so the table is empty, show a message on the middle of the page, that says "No Shipments Found".
+* Make the table responsive, so the table will take the full height of the page based on user screen size, and if we need to scroll the table, we scroll it without the page scrolling.
+* Make sure the table header is sticky, so when we scroll down the table, header will stick to the top so we can always see the column names.
