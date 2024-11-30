@@ -94,34 +94,78 @@ const DashboardCVGA = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
-        const response = await fetch('https://warehouse-data-server.onrender.com/api/testing-cvg/a_flow_shipment_data.json');
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch(
+          'https://warehouse-data-server.onrender.com/api/testing-cvg/a_flow_shipment_data.json'
+        );
+
         if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const text = await response.text();
-        let data;
-        try {
-          // Remove any surrounding quotes and clean the JSON string
-          const cleanedText = text.trim().replace(/^"|"$/g, '').replace(/\\"/g, '"');
-          data = JSON.parse(cleanedText);
-        } catch (e) {
-          console.error('Failed to parse JSON:', e);
-          throw new Error('Invalid JSON data');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        if (!Array.isArray(data)) {
-          throw new Error('Data is not an array');
-        }
+        const text = await response.text();
+        
+        try {
+          // Remove the outer quotes and unescape the inner quotes
+          let cleanedText = text.trim();
+          if (cleanedText.startsWith('"') && cleanedText.endsWith('"')) {
+            cleanedText = cleanedText.slice(1, -1);
+          }
+          
+          // Replace invalid JSON values and clean up the string
+          cleanedText = cleanedText
+            .replace(/\\"/g, '"')
+            .replace(/\\n/g, '')
+            .replace(/: NaN/g, ': null')
+            .replace(/: Infinity/g, ': null')
+            .replace(/: -Infinity/g, ': null');
+          
+          // Parse the cleaned JSON
+          const data = JSON.parse(cleanedText);
+          
+          if (!Array.isArray(data)) {
+            throw new Error('Expected array of shipments');
+          }
+          
+          // Map the data to our required format
+          const validData = data
+            .filter(item => item && typeof item === 'object')
+            .map(item => ({
+              shipment: item.shipment?.toString() || 'N/A',
+              shipment_end_date: item.shipment_end_date || 'N/A',
+              country: item.country || 'N/A',
+              process: item.process || 'N/A',
+              total_quantity: item.total_quantity?.toString() || 'N/A',
+              flow: item.flow || 'N/A',
+              total_hu_closed: item.total_hu_closed?.toString() || '0',
+              total_hu: item.total_hu?.toString() || '0',
+              hu_nested: item.hu_nested?.toString() || '0',
+              tos_packed: item.tos_packed?.toString() || '0',
+              total_lines: item.total_lines?.toString() || '0',
+              picked_lines: item.picked_lines?.toString() || '0',
+              is_created: item.is_created || false,
+              is_issue: item.is_issue || false,
+              issue_count: item.issue_count || 0,
+              transport_way: item.transport_way || 'N/A',
+              is_check: item.is_check || false,
+              is_vas: item.is_vas || false,
+              is_dg: item.is_dg || false
+            }));
 
-        const sortedData = sortByDate(data);
-        setShipments(sortedData);
-        setFilteredShipments(sortedData);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError(error.message);
+          const sortedData = sortByDate(validData);
+          setShipments(sortedData);
+          setFilteredShipments(sortedData);
+        } catch (parseError) {
+          console.error('Parse error:', parseError);
+          setError('Failed to parse shipment data. Please try again.');
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        setError(`Failed to load data: ${err.message}`);
+      } finally {
         setIsLoading(false);
       }
     };
