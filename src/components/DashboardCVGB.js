@@ -118,7 +118,7 @@ const DashboardCVGB = () => {
             .filter(item => item && typeof item === 'object')
             .map(item => ({
               delivery: item.delivery?.toString() || 'N/A',
-              cuttoff_dt: item.cuttoff_dt || null,  // Keep as number
+              cutoff_dt: item.cutoff_dt || null,  // Keep as number
               cutoff_tm: item.cutoff_tm || null,    // Keep as number
               country: item.country || 'N/A',
               flow: item.flow || 'N/A'
