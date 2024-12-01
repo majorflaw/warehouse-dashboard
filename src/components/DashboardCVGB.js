@@ -82,7 +82,7 @@ const DashboardCVGB = () => {
         setError(null);
         
         const response = await fetch(
-          'https://warehouse-data-server.onrender.com/api/testing-cvg/b_flow_delivery_data.json'
+          'https://warehouse-data-server.onrender.com/api/testing/b_flow_delivery_data.json'
         );
 
         if (!response.ok) {
