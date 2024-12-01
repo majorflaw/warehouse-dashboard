@@ -121,7 +121,7 @@ const DashboardCVGB = () => {
               cutoff_dt: item.cutoff_dt || null,  // Keep as number
               cutoff_tm: item.cutoff_tm || null,    // Keep as number
               country: item.country || 'N/A',
-              flow: item.flow || 'N/A'
+              total_lines: item.total_lines || 'N/A'
             }));
 
           console.log('Sample data:', validData[0]); // Debug log
@@ -229,7 +229,7 @@ const DashboardCVGB = () => {
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                            {shipment.flow}
+                            {shipment.total_lines}
                           </td>
                         </tr>
                       ))}
